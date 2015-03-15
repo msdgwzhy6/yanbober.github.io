@@ -8,13 +8,7 @@ description: Android开发者, 嵌入式开发者, 极客
 
 ## 置顶爆料头条
 
-[主页建设中...](http://www.baidu.com)
-
-## 置顶
-
-[主页建设中...](http://www.baidu.com)
-
-[主页建设中...](http://www.baidu.com)
+[安卓5.1隐秘功能曝光：谷歌VPN](http://www.ithome.com/html/android/135181.htm)
 
 ## Android开发
 
@@ -34,13 +28,13 @@ description: Android开发者, 嵌入式开发者, 极客
 
 [友情链接 《Android系统源代码情景分析》罗升阳老师CSDN博客主页 ](http://blog.csdn.net/luoshengyang?viewmode=contents)
 
-## 我的开源项目
+>## 我的开源项目
 
-[主页建设中...](http://www.baidu.com)
+>[主页建设中...](http://www.baidu.com)
 
-## 我的软件下载
+>## 我的应用下载
 
-[主页建设中...](http://www.baidu.com)
+>[主页建设中...](http://www.baidu.com)
 
 
 ## 移动设备浏览我的主页请扫描如下二维码:
