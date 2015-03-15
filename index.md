@@ -47,56 +47,54 @@ description: Android开发者, 嵌入式开发者, 极客
 
 <img src="./image/zhuye_erweima.png" />
 
-  <!-- 分页页码展示 -->
-  <div id="post-pagination">
-    <ul class="pagination pagination-centered pull-right">
-      <!-- 上一页按钮 -->
-      {% if paginator.previous_page %}
-      <li>
-        {% if paginator.previous_page == 1 %}
-        <a href="/"><i class="fa fa-chevron-left"></i></a>
-        {% else %}
-        <a href="/page{{ paginator.previous_page }}"><i class="fa fa-chevron-left"></i></a>
-        {% endif %}
-      </li>
-      {% else %}
-      <li class="disabled">
-      <span><i class="fa fa-chevron-left"></i></span>
-      </li>
-      {% endif %}
+<div id="post-pagination">
+<ul class="pagination pagination-centered pull-right">
 
-      <!-- 第一页,访问根目录 -->
-      {% if paginator.page == 1 %}
-      <li class="active">
-      <a href="#">1</a>
-      </li>
-      {% else %}
-      <li>
-      <a href="/">1</a>
-      </li>
-      {% endif %}
+{% if paginator.previous_page %}
+<li>
+{% if paginator.previous_page == 1 %}
+<a href="/"><i class="fa fa-chevron-left"></i></a>
+{% else %}
+<a href="/page{{ paginator.previous_page }}"><i class="fa fa-chevron-left"></i></a>
+{% endif %}
+</li>
+{% else %}
+<li class="disabled">
+<span><i class="fa fa-chevron-left"></i></span>
+</li>
+{% endif %}
 
-      {% for count in (2..paginator.total_pages) %}
-      {% if count == paginator.page %}
-      <li class="active">
-      <a href="#">{{ count }}</a>
-      </li>
-      {% else %}
-      <li>
-      <a href="/page{{ count }}">{{ count }}</a>
-      </li>
-      {% endif %}
-      {% endfor %}
+{% if paginator.page == 1 %}
+<li class="active">
+<a href="#">1</a>
+</li>
+{% else %}
+<li>
+<a href="/">1</a>
+</li>
+{% endif %}
 
-      {% if paginator.next_page %}
-      <li>
-      <a href="/page{{ paginator.next_page }}"><i class="fa fa-chevron-right"></i></a>
-      </li>
-      {% else %}
-      <li class="disabled">
-      <a href="#"><i class="fa fa-chevron-right"></i></a>
-      </li>
-      {% endif %}
-    </ul>
-  </div>
+{% for count in (2..paginator.total_pages) %}
+{% if count == paginator.page %}
+<li class="active">
+<a href="#">{{ count }}</a>
+</li>
+{% else %}
+<li>
+<a href="/page{{ count }}">{{ count }}</a>
+</li>
+{% endif %}
+{% endfor %}
+
+{% if paginator.next_page %}
+<li>
+<a href="/page{{ paginator.next_page }}"><i class="fa fa-chevron-right"></i></a>
+</li>
+{% else %}
+<li class="disabled">
+<a href="#"><i class="fa fa-chevron-right"></i></a>
+</li>
+{% endif %}
+</ul>
+</div>
 
