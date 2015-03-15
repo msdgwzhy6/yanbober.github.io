@@ -3,17 +3,16 @@ permalink: /:year/:month/:day/:title
 exclude: [".rvmrc", ".rbenv-version", "README.md", "Rakefile", "changelog.md"]
 auto: true
 pygments: true
-# 分页配置，每页最多显示几篇文章
+
 paginate: 10
 
-# 修改为自己的配置
 title : 知道+做到=得到
-tagline: 
+tagline: 工匠若水, 晏博, Android, Android开发, 安卓
 author :
   name : 工匠若水
-  email : 
-  github : 
-  twitter : 
+  email : yanbobersky@gmail.com
+  github : https://github.com/yanbober
+  sina : http://weibo.com/yanbober
 
 # The production_url is only used when full-domain names are needed
 # such as sitemap.txt 
@@ -84,7 +83,7 @@ site :
   comments :
     provider : duoshuo
     disqus :
-        short_name : your-disqus-code
+        short_name : null
     duoshuo :
         short_name : yanbober
    
@@ -94,9 +93,9 @@ site :
   # 修改google分析工具的id       
   # 如果想自定义分析服务提供商，请自行google
   analytics :
-    provider : google 
-    google : 
-        tracking_id : ''
+    provider : custom 
+#    google : 
+#        tracking_id : ''
 
   # Settings for sharing helper. 
   # Sharing is for things like tweet, plusone, like, reddit buttons etc.
