@@ -90,8 +90,6 @@ site :
   # Settings for analytics helper
   # Set 'provider' to the analytics provider you want to use.
   # Set 'provider' to false to turn analytics off globally.
-  # 修改google分析工具的id       
-  # 如果想自定义分析服务提供商，请自行google
   analytics :
     provider : custom 
 #    google : 
