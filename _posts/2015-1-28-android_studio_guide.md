@@ -1,7 +1,7 @@
 ---
 layout: post
-keywords: Android Studio, Android开发工具, AS, Android Studio使用
-description: 关于Google发布的最新Android开发IDE，取代Eclipse的大势所在。
+keywords: Android Studio, Android Studio调试, Android开发工具, AS, Android Studio教程
+description: Android Studio, Android Studio调试, Android开发工具, AS, Android Studio教程
 title: "Google利器Android Studio从入门到精通"
 categories: [开发工具]
 tags: [Android Studio]
@@ -170,10 +170,61 @@ build.gradle：//Module的Gradle构建脚本
 
 ##Android Studio开发调试使用
 
+Android Studio调试其实也非常方便，一般问题直接通过AS的DDMS的Logcat就可以搞定。AS支持类似Eclipse的DDMS的所有功能。
+这里要说的是疑难问题的调试方式，即断点调试。
+
+首先先编译好要调试的程序。
+
+<img src="http://yanbober.github.io/image/2015-1-28-android_studio_guide_6.png" />
+
+如上图2所示在行号处点击设置断点。然后如1所示点击开启调试会话。
+
+<img src="http://yanbober.github.io/image/2015-1-28-android_studio_guide_7.png" />
+
+如上图所示，IDE下方出现Debug视图，1指向的是现在调试程序停留的代码行，2区域是程序的方法调用栈区。在这个区域中显示了
+程序执行到断点处所调用过的所用方法，越下面的方法被调用的越早。由此顺序想必有些Android深入功底了解一点Android系统启
+动流程的就知道这几个方法咋回事，怎么到Activity的onCreate的。哈哈，说到系统了。不扯了。3是一些调试按钮，快捷键放在上
+面直接会显示。4和5是一些变量观察区。
+
+<img src="http://yanbober.github.io/image/2015-1-28-android_studio_guide_8.png" />
+
+上图中：
+
+点击1指向的按钮，程序向下执行一行，如果当前行有方法调用，这个方法将被执行完毕返回，然后到下一行。
+
+点击2指向的按钮，程序向下执行一行。如果该行有自定义方法，则运行进入自定义方法（不会进入官方类库的方法）。
+
+点击3钮在调试的时候能进入任何方法。
+
+点击4的作用是如果在调试的时候你进入了一个方法(如debugFunc)，并觉得该方法没有问题，你就可以使用4跳出该方法，
+返回到该方法被调用处的下一行语句。值得注意的是，该方法已执行完毕。
+
+点击5指向的按钮后，你将返回到当前方法的调用处重新执行，并且所有上下文变量的值也回到那个时候。只要调用链中
+还有上级方法，可以跳到其中的任何一个方法。
+
+<img src="http://yanbober.github.io/image/2015-1-28-android_studio_guide_9.png" />
+
+如上图设置多个断点，开启调试。想跨断点移动到下一个断点，点击如下图1箭头，程序将运行一个断点到下一个断点之间需要
+执行的代码。如果后面代码没有断点，再次点击该按钮将会执行完程序。点击箭头2指向的按钮，可以查看你曾经设置过的断点
+并可设置断点的一些属性，如下图所示。调试开始后，在Variables区域可以给指定的变量赋值（鼠标左键选择变量，右键弹出菜单选择
+setValue...）。这个功能可以更加快速的检测你的条件语句和循环语句。点击箭头3加号或者在调试的代码变量上右键添加watcher
+即可查看跟踪变量值。
+
+<img src="http://yanbober.github.io/image/2015-1-28-android_studio_guide_10.png" />
+
+上图箭头1指向的是你曾经设置过的断点，箭头2可以设置条件断点（满足某个条件的时候，暂停程序的执行，如 index==5）。
+结束调试后，应该在箭头1处把所设的断点删除(选择要删除的断点后，点击上方的红色减号）。
+
+以上便是AS的一些调试使用技巧。
+
 ##Android Studio构建系统基础
+
+此部分网络比我写的好的文章太多，所以直接给上一些个人认为基础入门整理的比较清晰的文章链接即可。深入学习需要日积月累。
+
+
 
 ##Android Studio总结
 
-
+到此你已经可以顺利使用Android Studio进行应用程序开发。其他的问题相信聪明的您使用Google可以搞定，祝你好运！
 
 	（烦请令尊体谅作者劳动成果，转载麻烦声明文章链接。您的声明与讨论是鄙人写作的动力。本篇文章依据时间及个人情况持续跟新中......）
