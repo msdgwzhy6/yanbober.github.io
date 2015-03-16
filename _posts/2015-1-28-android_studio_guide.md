@@ -170,9 +170,9 @@ build.gradle：//Module的Gradle构建脚本
 
 ##Android Studio开发调试使用
 
-##AS构建系统基础
+##Android Studio构建系统基础
 
-##总结
+##Android Studio总结
 
 
 
