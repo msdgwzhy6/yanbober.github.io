@@ -27,7 +27,7 @@ icon: file-alt
 下载下来以后安装的过程可以忽略了吧，能安装的都是程序猿吧，所以安装这点就不说了。
 
 安装好了以后首次运行AS可能一直停在Fetching Android SDK component information。如下界面：
-<img src="./../image/2015-1-28-android_studio_guide_1.png" />
+<img src="http://yanbober.github.io/image/2015-1-28-android_studio_guide_1.png" />
 这是因为天朝的墙真的太高太厚把首次运行更新SDK给墙了。解决办法就是关闭安装向导，如果无法关闭可以在任务管理器中手动关掉进程（Ctrl+Alt+Del启动任务管理器），然后
 打开AS安装目录下的bin目录里面的idea.properties文件，添加一条禁用开始运行向导的配置项：
 	disable.android.first.run=true
