@@ -24,7 +24,7 @@ icon: file-alt
 先吐槽下天朝的强大吧，不得不拜服天朝的墙。如果你有梯子请去Android Developer下载最新版的AS安装包，如果你没有梯子那也有个办法，就是去[Android Studio中文社区官
 网](http://www.android-studio.org/)下载你的平台需要的安装包。
 
-下载下来以后安装的过程可以忽略了吧，能安装的都是程序猿吧，所以安装这点就不说了。
+下载下来以后安装的过程可以忽略了吧，能安装的都是程序猿吧，所以安装这点就不说了，注意已经正确安装配置了JDK。
 
 安装好了以后首次运行AS可能一直停在Fetching Android SDK component information。如下界面：
 
@@ -63,6 +63,93 @@ be fetched using http://选中，然后退出将上面在idea.properties配置�
 gradle-2.2-all.zip之前已经下载OK的。至于啥时gradle后文会有说明。这儿只是告诉你若果你看到卡一会儿时正常的。
 
 接下来进入到了工程界面下：
+
+<img src="http://yanbober.github.io/image/2015-1-28-android_studio_guide_4.png" />
+
+这个创建过程可比Eclipse上长的多。主要是因为从gradle上下载。gradle也可以手动离线下载好放在对应目录下。工程的结构和Eclipse上的不同，src下分为java和res。
+AS是基于idea，而idea和eclipse有大的区别，有好处也有不好的地方，在一段时间里，idea被认为是开发java最好用强大的ide工具，所以AS新建的时候有new application和new module
+开发。idea没有工作空间这样的说法。这就是Eclipse用户切换过来第一个比较不适应的地方。
+
+具体说就是：
+
+	1. android studio是单工程的开发模式
+	2. android studio中的application相当于eclipse里的workspace概念
+	3. android studio中的module相当于eclipse里的project概念
+
+有了如上三条概念自己手动创建摸索下，相信聪明的你自然就明白咋回事了吧。
+
+接下来看一些工欲善其事必先利其器的基本高频率实用设置：
+
+	1. 中文乱码
+	
+	在窗口中，找到IDE Settings->Appearance，在右侧勾选上“Override default fonts by”，然后在第一个下拉框中选择字体为“simsun”，然后apply，重启IDE，就好了。
+
+	2. 设置快捷键
+	
+	在settings窗口中，找到IDE Settings->keymap，右侧打开的就是快捷键了。
+	右键单击要修改的快捷键，会弹出一个菜单，选择“Add keyboard shortcut”就可以修改快捷键了。删除的话，在弹出的菜单中选择remove XXX即可。
+	特别说明，在AS的快捷键设置里可以直接设置使用Eclipse快捷键还是别的IDE快捷键。如果你热衷Eclipse那么也可设置成Eclipse的快捷键。	
+
+	3. 修改主题
+	
+	在IDE Settings->Appearance，右侧的Theme选择自己喜欢的主题即可。个人比较喜欢Darcula主题，也就是如上截图样式。
+
+	4. 如何将Eclipse工程导入AS使用
+	
+	选择File->Import Project，在弹出的菜单中选择要导入的工程即可，选择好以后就直接next，在第二个窗口中也选择默认的第一个选项就可以。
+	需要注意的是，在AS中，有两种工程，一个是Project，一个是Module，上面已经细说过了。
+
+	5. 导入jar包
+	
+	选择File->Projcet Structure，在弹出的窗口中左侧找到Libraries并选中，然后点击“+”，并选择Java就能导入Jar包了。
+
+	6. 删除项目
+	
+	AS对工程删除做了保护机制，默认你在项目右键发现没有删除选项。你会发现你的module上面会有一个小手机，这是保护机制。删除的第一步就是去掉保护机制，也就是
+	让手机不见，具体做法就是鼠标放在工程上右键->open module setting，或者F4进入如图界面：
+	
+<img src="http://yanbober.github.io/image/2015-1-28-android_studio_guide_5.png" />
+
+	选中你要删除的module，然后点击减号，这样就取消了保护机制，然后回到项目工程右键就可发现删除选项。注意：删除会将源文件删除。
+	
+	7. 修改工程目录
+	
+	在创建项目的时候，在Project Location中选好工程目录后，要自己输入一个文件夹的名字用来保存工程，然后就能使用自己的工程目录了。
+	
+## 入门总结
+
+到此为止AS的基本情况相信你已经有个大致了解了。具体比Eclipse的优势体现在如下几点：
+
+相信目前国内用Eclipse的还是大多数，那么首先就来说一下Studio的一些优点，比较才能更有说服力，才能说明为什么我们要从Eclipse迁移到Studio。
+
+	1. AS是Google专门为Android基于IntelliJ IDEA打造的利器。亲生的永远是最好的，只是现在还在成长中而已。
+
+	2. AS在速度上不管哪一个方面都比Eclipse快。
+
+	3. Darcula主题UI简直就是极客范，帅爆了。
+
+	4. 强大的智能提示补全功能在写代码时简直比Eclipse高效率N倍。
+	
+	5. 智能保存，不需要Ctrl + S。效率会大大提升。
+
+	6. 整合Gradle构建工具，Gradle集合了Ant和Maven的优点，不管是配置、编译、打包都非常牛逼。
+
+	7. UI编辑器简直比Eclipse高效N倍，自带了多设备的实时预览，简直是神器。多语言适配点击地球直接输入，再也不用比较那个string没有翻译了。
+
+	8. 内置终端直接替代cmd命令行，一个IDE全部搞定。
+
+	9. 完善的插件系统，如Git、Markdown、Gradle等，直接搜索下载。
+
+	10. 版本控制系统，安装的时候就自带GitHub, Git, SVN等流行的版本控制系统，可以直接check out你的项目，边写代码边右键可以直接具备BCompare功能与其他版本进行对比修改。
+
+总之就一句话，相信我，若果你和我一样是Eclipse用户切换过来，那么你绝对不会再切换回去，你会爱上AS的。
+
+##Android Studio目录结构及相关操作
+
+
+##Android Studio开发调试使用
+
+##总结
 
 
 
