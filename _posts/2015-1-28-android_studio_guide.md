@@ -27,15 +27,21 @@ icon: file-alt
 下载下来以后安装的过程可以忽略了吧，能安装的都是程序猿吧，所以安装这点就不说了。
 
 安装好了以后首次运行AS可能一直停在Fetching Android SDK component information。如下界面：
+
 <img src="http://yanbober.github.io/image/2015-1-28-android_studio_guide_1.png" />
+
 这是因为天朝的墙真的太高太厚把首次运行更新SDK给墙了。解决办法就是关闭安装向导，如果无法关闭可以在任务管理器中手动关掉进程（Ctrl+Alt+Del启动任务管理器），然后
 打开AS安装目录下的bin目录里面的idea.properties文件，添加一条禁用开始运行向导的配置项：
+
 	disable.android.first.run=true
+	
 然后再启动程序就会打开项目向导界面，这个时候如果点击Start a new Android Studio project是没有反应的，并且在Configure下面的SDK Manager是灰色的，这是因为没有安装
 Android SDK的缘故。这时候一般有两种做法：
+
 1. 自己没有SDK，需要从网络下载；打开向导的Configure-Settings，在查找框里面输入proxy，找到下面的HTTP Proxy，设置代理服务器，并且将Force https://... sources to 
 be fetched using http://选中，然后退出将上面在idea.properties配置文件中添加的那条配置项注释掉重新打开Android Studio等刚开始的向导把Android SDK下载安装完成就可
 以了。
+
 2. 自己有SDK，重新指定SDK路径；打开向导的Configure->Project Defaults->Project Structure，在此填入你已有的SDK路径。
 
 此时重启AS就可以在向导里新建Android工程喽。至此整个安装过程结束。
