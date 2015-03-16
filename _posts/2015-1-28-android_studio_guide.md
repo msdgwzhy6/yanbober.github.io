@@ -107,8 +107,6 @@ AS是基于idea，而idea和eclipse有大的区别，有好处也有不好的地
 
 到此为止AS的基本情况相信你已经有个大致了解了。具体比Eclipse的优势体现在如下几点：
 
-相信目前国内用Eclipse的还是大多数，那么首先就来说一下Studio的一些优点，比较才能更有说服力，才能说明为什么我们要从Eclipse迁移到Studio。
-
 1. AS是Google专门为Android基于IntelliJ IDEA打造的利器。亲生的永远是最好的，只是现在还在成长中而已。
 
 2. AS在速度上不管哪一个方面都比Eclipse快。
@@ -131,10 +129,48 @@ AS是基于idea，而idea和eclipse有大的区别，有好处也有不好的地
 
 总之就一句话，相信我，若果你和我一样是Eclipse用户切换过来，那么你绝对不会再切换回去，你会爱上AS的。
 
-##Android Studio目录结构及相关操作
+##Android Studio目录结构
 
+新建工程项目后AS的Product目录结构如下所示：
+
+{% highlight ruby %}
+
+.idea				AS生成的工程配置文件，类似Eclipse的project.properties。
+app					AS创建工程中的一个Module。
+gradle				构建工具系统的jar和wrapper等，jar告诉了AS如何与系统安装的gradle构建联系。
+External Libraries	不是一个文件夹，只是依赖lib文件，如SDK等。
+
+{% endhighlight %}
+
+新建工程项目后AS的Module目录结构如下所示：
+
+{% highlight ruby %}
+
+build：	构建目录，相当于Eclipse中默认Java工程的bin目录，鼠标放在上面右键Show in Exploer即可打开文件夹，
+		编译生成的apk也在这个目录的outs子目录，不过在AS的工程里是默认不显示out目录的，就算有编译结果也
+		不显示，右键打开通过文件夹直接可以看。
+libs：	依赖包，包含jar包和jni等包。
+src： 	源码，相当于eclipse的工程。
+    main	主文件夹 
+        java 	Java代码，包含工程和新建是默认产生的Test工程源码。 
+        res 	资源文件，类似Eclipse。
+            layout 	App布局及界面元素配置，雷同Eclipse。
+            menu 	App菜单配置，雷同Eclipse。 
+            values 	雷同Eclipse。
+                dimens.xml 	定义css的配置文件。 
+                strings.xml 定义字符串的配置文件。 
+                styles.xml 	定义style的配置文件。
+				......		arrays等其他文件。
+			......	assets等目录
+        AndroidManifest.xml 	App基本信息（Android管理文件） 
+        ic_launcher-web.png 	App图标 
+build.gradle	Module的Gradle构建脚本
+
+{% endhighlight %}
 
 ##Android Studio开发调试使用
+
+##AS构建系统基础
 
 ##总结
 
