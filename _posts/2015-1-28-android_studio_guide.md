@@ -48,81 +48,22 @@ be fetched using http://选中，然后退出将上面在idea.properties配置�
 
 ##基本使用介绍
 
+首先新建工程，输入工程名和主包名和存储路径；点击next到如图步骤：
 
-{% highlight ruby %}
-public class DemoActivity extends Activity {
+<img src="http://yanbober.github.io/image/2015-1-28-android_studio_guide_2.png" />
 
-    static final String TAG = DemoActivity.class.getSimpleName();
+上图中首先你可选择你的App要适配的设备是Wear还是Mobile还是TV。在你新建App选择最低适配版本时，强大的AS会给你一些有用的统计提示，如图描述了当前版本的用户情况，点
+击Help me choose后弹出如下更加形象的分布图表描述：
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate");
-        setContentView(R.layout.activity_demo);
-    }
+<img src="http://yanbober.github.io/image/2015-1-28-android_studio_guide_3.png" />
 
-    @Override
-    public void onContentChanged() {
-        super.onContentChanged();
-        Log.d(TAG, "onContentChanged");
-    }
+爱不释手的亮点就是这么一步一步比Eclipse强大的，这只是一些不值得一提的小点而已，强大的功能还在后面。继续点击Next选择形象友好的GUI模板，点击完成进入工程初始化过程。
 
-    public void onStart() {
-        super.onStart();
-        Log.d(TAG, "onStart");
-    }
+第一次安装工程初始化时由于需要联网下载gradle会比较慢，不过有时候不是第一也会慢，工程依赖的gradle版本不匹配时也会自动重新下载；我的初始化很快，原因是我本地的
+gradle-2.2-all.zip之前已经下载OK的。至于啥时gradle后文会有说明。这儿只是告诉你若果你看到卡一会儿时正常的。
 
-    public void onRestart() {
-        super.onRestart();
-        Log.d(TAG, "onRestart");
-    }
+接下来进入到了工程界面下：
 
-    public void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        Log.d(TAG, "onPostCreate");
-    }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d(TAG, "onResume");
-    }
-
-    public void onPostResume() {
-        super.onPostResume();
-        Log.d(TAG, "onPostResume");
-    }
-
-    public void onPause() {
-        super.onPause();
-        Log.d(TAG, "onPause");
-    }
-
-    public void onStop() {
-        super.onStop();
-        Log.d(TAG, "onStop");
-    }
-
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d(TAG, "onDestroy");
-    }
-
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        Log.d(TAG, "onConfigurationChanged");
-    }
-
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Log.d(TAG, "onSaveInstanceState");
-    }
-
-    public void onRestoreInstanceState(Bundle outState) {
-        super.onRestoreInstanceState(outState);
-        Log.d(TAG, "onRestoreInstanceState");
-    }
-}
-{% endhighlight %}
 
 	（烦请令尊体谅作者劳动成果，转载麻烦声明文章链接。您的声明与讨论是鄙人写作的动力。本篇文章依据时间及个人情况持续跟新中......）
