@@ -6,6 +6,11 @@ description: Android开发者, 嵌入式开发者, 极客
 ---
 {% include site/setup %}
 
+<a href="http://www3.clustrmaps.com/user/6b811baec">
+<img src="http://www3.clustrmaps.com/stats/maps-no_clusters/yanbober.github.io-thumb.jpg" alt="Locations of visitors to this page" />
+</a>
+
+
 ## 置顶爆料头条
 
 [安卓5.1隐秘功能曝光：谷歌VPN](http://www.ithome.com/html/android/135181.htm)
