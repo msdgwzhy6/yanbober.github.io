@@ -219,7 +219,7 @@ setValue...）。这个功能可以更加快速的检测你的条件语句和循
 
 ##Android Studio构建系统基础
 
-###基础知识
+####基础知识
 
 项目创建成功后会自动下载Gradle，这个过程特别慢，建议翻墙。下载的Gradle在Windows平台会默认在 C:\Documents and Settings\<用户名>\
 .gradle\wrapper\dists目录，这个目录下有个gradle-x.xx-all的文件夹,。也可以自己手动到Gradle官网下载对应的版本，然后将下载的.zip文件
@@ -293,7 +293,7 @@ dependencies {					//依赖支持
 
 {% endhighlight %}
 
-###Gradle打包APP签名
+####Gradle打包APP签名
 
 默认情况下，debug被配置成使用一个debug keystory。debug keystory使用了默认的密码和默认key及默认的key密码。debug构建类型会自动使用debug签名配置。
 在你的Module的build.gradle文件中添加：
@@ -329,7 +329,7 @@ android {
 虽然经常使用项目根目录的相对路径作为keystore的路径，但是也可以使用绝对路径，尽管这并不推荐（除了自动创建出来的debug keystore）。
 运行gradle clean gradle build即可生成签名混淆对齐的app。
 
-###Gradle构建Android应用多渠道包（批量打包）
+####Gradle构建Android应用多渠道包（批量打包）
 
 Android应用的发布需要面对各种各样的市场，我们称之为渠道。通常作为开发者我们需要知道应用是从哪个渠道下载的。这种统计信息一般常用的
 是百度统计或者友盟统计。这里举例时使用友盟统计为例说明问题。原理是Gradle的Manifest Merger。
