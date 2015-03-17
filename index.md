@@ -2,25 +2,9 @@
 layout: index
 title: 工匠若水
 keywords: 晏博, 工匠若水, android, java, C语言, PHP, 脚本, android developer, android开发, android技术分享, 极客
-description: Android开发者, 嵌入式开发者, 极客
+description: 工匠若水的主页-开发者干货分享
 ---
 {% include site/setup %}
-
-<div id="clustrmaps-widget"></div>
-<script type="text/javascript">
-var _clustrmaps = {'url' : 'http://yanbober.github.io', 'user' : 1161964, 'server' : '3', 'id' : 'clustrmaps-widget', 'version' : 1, 'date' : '2015-03-17', 'lang' : 'zh', 'corners' : 'square' };
-(function (){ var s = document.createElement('script'); s.type = 'text/javascript'; s.async = true; s.src = 'http://www3.clustrmaps.com/counter/map.js'; 
-var x = document.getElementsByTagName('script')[0]; x.parentNode.insertBefore(s, x);})();
-</script><noscript>
-<a href="http://www3.clustrmaps.com/user/6b811baec">
-<img src="http://www3.clustrmaps.com/stats/maps-no_clusters/yanbober.github.io-thumb.jpg" alt="Locations of visitors to this page" />
-</a>
-</noscript>
-
-<iframe width="800" scrolling="no" height="120" frameborder="0" allowtransparency="true" 
-src="http://i.tianqi.com/index.php?c=code&id=19&color=%230070C0&icon=1&py=xiangzhouqu&temp=1&num=3">
-</iframe>
-
 
 ## 置顶爆料头条
 
