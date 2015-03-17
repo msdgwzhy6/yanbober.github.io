@@ -17,6 +17,10 @@ var x = document.getElementsByTagName('script')[0]; x.parentNode.insertBefore(s,
 </a>
 </noscript>
 
+<iframe width="800" scrolling="no" height="120" frameborder="0" allowtransparency="true" 
+src="http://i.tianqi.com/index.php?c=code&id=19&color=%230070C0&icon=1&py=xiangzhouqu&temp=1&num=3">
+</iframe>
+
 
 ## 置顶爆料头条
 
@@ -46,6 +50,19 @@ var x = document.getElementsByTagName('script')[0]; x.parentNode.insertBefore(s,
 ## 移动设备浏览我的主页请扫描如下二维码:
 
 <img src="./image/zhuye_erweima.png" />
+
+
+<div class="bshare-custom"><a title="分享到QQ空间" class="bshare-qzone"></a>
+<a title="分享到新浪微博" class="bshare-sinaminiblog"></a>
+<a title="分享到人人网" class="bshare-renren"></a>
+<a title="分享到腾讯微博" class="bshare-qqmb"></a>
+<a title="分享到有道笔记" class="bshare-youdaonote"></a>
+<a title="更多平台" class="bshare-more bshare-more-icon more-style-addthis">
+</a><span class="BSHARE_COUNT bshare-share-count">0</span>
+</div><script type="text/javascript" charset="utf-8" src="http://static.bshare.cn/b/buttonLite.js#style=-1&amp;uuid=&amp;pophcol=2&amp;lang=zh">
+</script><script type="text/javascript" charset="utf-8" src="http://static.bshare.cn/b/bshareC0.js">
+</script>
+
 
 <div id="post-pagination">
 <ul class="pagination pagination-centered pull-right">
