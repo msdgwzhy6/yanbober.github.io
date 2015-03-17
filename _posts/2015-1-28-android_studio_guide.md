@@ -219,10 +219,179 @@ setValue...）。这个功能可以更加快速的检测你的条件语句和循
 
 ##Android Studio构建系统基础
 
-此部分网络比我写的好的文章太多，所以直接给上一些个人认为基础入门整理的比较清晰的文章链接即可。深入学习需要日积月累。
+###基础知识
 
+项目创建成功后会自动下载Gradle，这个过程特别慢，建议翻墙。下载的Gradle在Windows平台会默认在 C:\Documents and Settings\<用户名>\
+.gradle\wrapper\dists目录，这个目录下有个gradle-x.xx-all的文件夹,。也可以自己手动到Gradle官网下载对应的版本，然后将下载的.zip文件
+(也可以解压)复制到上述的gradle-x.xx-all 文件夹下。
 
+每一个Module都需要有一个gradle配置文件，语法都是一样，唯一不同的是开头声明的是apply plugin。注意区分不同位置的build.gradle文件。
 
+AS的工程根目录下的build.gradle文件：
+
+{% highlight ruby %}
+
+buildscript {		//设置脚本的运行环境
+    repositories {	//支持java依赖库管理（maven/ivy等）,用于项目的依赖
+		//mavenCentral()	//仅仅是不同的网络仓库而已
+        jcenter()			//推荐使用这个仓库
+    }
+	//依赖包的定义。支持maven/ivy、远程、本地库、单文件，前面定义了repositories{}jcenter库，使用jcenter的依赖只需要按照
+	//类似于com.android.tools.build:gradle:1.0.0-rc2，gradle就会自动的往远程库下载相应的依赖。
+    dependencies {	
+        classpath 'com.android.tools.build:gradle:1.0.0-rc2'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+//多项目的集中配置，多数构建工具，对于子项目的配置，都是基于继承的方式。Gradle除了提供继承方式设置子项目，还提供这种配置
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
+{% endhighlight %}
+
+AS的工程根目录下的settings.gradle文件：
+
+{% highlight ruby %}
+
+include ':app'		//module
+include ':my_lib'	//module(build as lib)
+
+{% endhighlight %}
+
+AS的工程根目录下的Module的build.gradle文件（此处以一个简单的Lib module的gradle为例）：
+
+{% highlight ruby %}
+
+//plugin在AS里取值一般为'com.android.library'或者'com.android.application'
+apply plugin: 'com.android.library'	//构建为lib
+
+android {
+    compileSdkVersion 17			//编译需要SDK版本
+    buildToolsVersion "19.1.0"		//SDK Manager确定本地安装该版本才可以
+
+    defaultConfig {
+        minSdkVersion 8			//最小版本
+        targetSdkVersion 17		//目标版本
+    }
+
+    buildTypes {				//编译项
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+dependencies {					//依赖支持
+    compile 'com.android.support:support-v4:18.+'
+}
+
+{% endhighlight %}
+
+###Gradle打包APP签名
+
+默认情况下，debug被配置成使用一个debug keystory。debug keystory使用了默认的密码和默认key及默认的key密码。debug构建类型会自动使用debug签名配置。
+在你的Module的build.gradle文件中添加：
+
+{% highlight ruby %}
+
+android {
+	......
+	signingConfigs {
+	   myConfig{
+		 storeFile file("yanbober.keystore")
+			storePassword "gradle"
+			keyAlias "gradle"
+			keyPassword "gradle"
+		}
+	}
+    
+   buildTypes{
+     release {
+		runProguard true
+		zipAlignEnabled true
+        // 移除无用的resource文件
+        shrinkResources true
+        proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+	 
+    	signingConfig  signingConfigs.myConfig
+     } 
+   }
+}
+
+{% endhighlight %}
+
+虽然经常使用项目根目录的相对路径作为keystore的路径，但是也可以使用绝对路径，尽管这并不推荐（除了自动创建出来的debug keystore）。
+运行gradle clean gradle build即可生成签名混淆对齐的app。
+
+###Gradle构建Android应用多渠道包（批量打包）
+
+Android应用的发布需要面对各种各样的市场，我们称之为渠道。通常作为开发者我们需要知道应用是从哪个渠道下载的。这种统计信息一般常用的
+是百度统计或者友盟统计。这里举例时使用友盟统计为例说明问题。原理是Gradle的Manifest Merger。
+
+在AndroidManifest.xml里配置所谓的PlaceHolder。
+
+{% highlight ruby %}
+
+<meta-data
+        android:name="CHANNEL"
+        android:value="${CHANNEL_VALUE}" />
+
+{% endhighlight %}
+
+在模块build.gradle文件的defaultConfig加上PlaceHolder，作用是声明CHANNEL_VALUE是可替换值的PlaceHolder，同时为其设置yanbober默认值。
+
+{% highlight ruby %}
+
+android {
+	......
+
+	defaultConfig {
+    	......
+    	manifestPlaceholders = [ CHANNEL_VALUE:"yanbober" ]
+	}	
+}
+
+{% endhighlight %}
+
+在模块的build.gradle文件里添加ProductFlavors配置。ProductFlavors其实就是可定义的product特性，与Manifest Merger使用就可以在一次编译过程中
+产生多个具有自己特性配置的版本。下面这个配置的作用就是为每个渠道包产生不同的CHANNEL_VALUE的值。
+
+{% highlight ruby %}
+
+android {
+	......
+
+	defaultConfig {
+    	......
+    	manifestPlaceholders = [ CHANNEL_VALUE:"yanbober" ]
+	}	
+	productFlavors {
+    	yanbober{}
+    	wandoujia{}
+    	xiaomi{}
+    	baidu{}
+	}
+	productFlavors.all { flavor ->
+    	flavor.manifestPlaceholders = [ CHANNEL_VALUE:name ]
+	}
+}
+
+{% endhighlight %}
+	
+批量生成多渠道包：进入工程目录下运行gradlew assembleRelease。可以看到编译一共产生了4个apk，分别对应在productFlavors段定义的4个渠道。
+反编译打开AndroidManifest.xml就会发现CHANNEL这一段的配置已经被修改。
+       
+生成单个渠道包：打开AS的Gradle Tasks面板模块有很多任务，直接双击对应的耽搁渠道任务生成对应的apk。用命令行单独生成xiaomi渠道使用
+gradlew assemblexiaomiRelease就好了。
+
+好了，Gradle的基本情况就说到这，具体可以阅读官网或者查阅其他资料，Gradle的使用需要经验的积累。
+	
 ##Android Studio总结
 
 到此你已经可以顺利使用Android Studio进行应用程序开发。其他的问题相信聪明的您使用Google可以搞定，祝你好运！总之AS的强大需要你自己去
