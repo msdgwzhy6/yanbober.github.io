@@ -10,7 +10,11 @@ icon: file-alt
 ---
 {% include site/setup %}
 
+<hr>
+
 目标：Android Studio新手-->下载安装配置-->零基础入门-->基本使用-->调试技能-->构建项目基础-->使用AS应对常规应用开发
+
+<hr>
 
 ##AS简介
 
@@ -18,6 +22,8 @@ icon: file-alt
 支持Windows、Mac、Linux等操作系统，基于流行的Java语言集成开发环境IntelliJ搭建而成。该IDE在2013年5月的Google I/O开发者大会上首次露面，当时的测试版各种莫名其
 妙的Bug，但是14年12月8日发布的版本是稳定版。Android Studio 1.0推出后，Google官方将逐步放弃对原来主要的Eclipse ADT的支持，并为Eclipse用户提供了工程迁移的解
 决办法。不过相信作为Developer的你上手AS 1.0以后你再也不愿意使用原来苦逼的Eclipse+ADT了，你会被AS的各种强大所吸引。
+
+<hr>
 
 ##下载安装
 
@@ -47,6 +53,8 @@ be fetched using http://选中，然后退出将上面在idea.properties配置�
 2. 自己有SDK，重新指定SDK路径；打开向导的Configure->Project Defaults->Project Structure，在此填入你已有的SDK路径。
 
 此时重启AS就可以在向导里新建Android工程喽。至此整个安装过程结束。
+
+<hr>
 
 ##基本使用介绍
 
@@ -102,7 +110,9 @@ AS是基于idea，而idea和eclipse有大的区别，有好处也有不好的地
 <img src="http://yanbober.github.io/image/2015-1-28-android_studio_guide_5.png" />
 
 7. 修改工程目录-----在创建项目的时候，在Project Location中选好工程目录后，要自己输入一个文件夹的名字用来保存工程，然后就能使用自己的工程目录了。
-	
+
+<hr>
+
 ## 入门总结
 
 到此为止AS的基本情况相信你已经有个大致了解了。具体比Eclipse的优势体现在如下几点：
@@ -128,6 +138,8 @@ AS是基于idea，而idea和eclipse有大的区别，有好处也有不好的地
 10. 版本控制系统，安装的时候就自带GitHub, Git, SVN等流行的版本控制系统，可以直接check out你的项目，边写代码边右键可以直接具备BCompare功能与其他版本进行对比修改。
 
 总之就一句话，相信我，若果你和我一样是Eclipse用户切换过来，那么你绝对不会再切换回去，你会爱上AS的。
+
+<hr>
 
 ##Android Studio目录结构
 
@@ -167,6 +179,8 @@ src：//源码，相当于eclipse的工程。
 build.gradle：//Module的Gradle构建脚本
 
 {% endhighlight %}
+
+<hr>
 
 ##Android Studio开发调试使用
 
@@ -216,6 +230,8 @@ setValue...）。这个功能可以更加快速的检测你的条件语句和循
 结束调试后，应该在箭头1处把所设的断点删除(选择要删除的断点后，点击上方的红色减号）。
 
 以上便是AS的一些调试使用技巧。
+
+<hr>
 
 ##Android Studio构建系统基础
 
@@ -392,6 +408,8 @@ gradlew assemblexiaomiRelease就好了。
 
 好了，Gradle的基本情况就说到这，具体可以阅读官网或者查阅其他资料，Gradle的使用需要经验的积累。
 	
+<hr>	
+	
 ##Android Studio插件安装及使用Genymotion模拟器
 	
 Android Studio自带的模拟器速度已经比Eclipse插件的快一点了，但是还不够暴力，不够爽。现在来说说最暴力的Genymotion模拟器如何结合AS使用。
@@ -416,9 +434,13 @@ Android Studio自带的模拟器速度已经比Eclipse插件的快一点了，�
 
 至此快速模拟器Genymotion已经搞定，提升你的速度。其他的插件安装也就触类旁通了。
 	
+<hr>
+	
 ##Android Studio总结
 
 到此你已经可以顺利使用Android Studio进行应用程序开发。其他的问题相信聪明的您使用Google可以搞定，祝你好运！总之AS的强大需要你自己去
 慢慢探索，你会发现不知不觉你会爱上他的。
+
+<hr>
 
 	（烦请令尊体谅作者劳动成果，转载麻烦声明文章链接。您的声明与讨论是鄙人写作的动力。本篇文章依据时间及个人情况持续更新中......）
