@@ -3,7 +3,7 @@ layout: post
 keywords: jni, Android Studio, ndk
 description: Android Studio NDK, Android Studio JNI, JNI, NDK
 title: "NDK-JNI实战教程（一） 在Android Studio运行第一个NDK程序"
-categories: [NDK-JNI]
+categories: [NDK-JNI开发]
 tags: [NDK, JNI]
 group: archive
 icon: file-alt
