@@ -102,6 +102,7 @@ AS是基于idea，而idea和eclipse有大的区别，有好处也有不好的地
 需要注意的是，在AS中，有两种工程，一个是Project，一个是Module，上面已经细说过了。
 
 5. 导入jar包-----选择File->Projcet Structure，在弹出的窗口中左侧找到Libraries并选中，然后点击“+”，并选择Java就能导入Jar包了。
+或者直接拷贝jar文件到项目的libs文件夹下，然后运行：Sync Project with Gradle Files。然后clean project重新编译。
 
 6. 删除项目-----AS对工程删除做了保护机制，默认你在项目右键发现没有删除选项。你会发现你的module上面会有一个小手机，这是保护机制。删除的第一步就是去掉保护机制，也就是
 让手机不见，具体做法就是鼠标放在工程上右键->open module setting，或者F4进入如图界面，选中你要删除的module，然后点击减号，这样就取消了保护机制，然后回到项目工程右键就
