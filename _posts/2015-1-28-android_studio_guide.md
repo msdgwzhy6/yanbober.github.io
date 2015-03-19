@@ -1,6 +1,6 @@
 ---
 layout: post
-keywords: Android Studio, Android Studio调试, Android开发工具, AS, Android Studio教程
+keywords: Genymotion, Android Studio, Android Studio调试, Android开发工具, AS, Android Studio教程
 description: Android Studio, Android Studio调试, Android开发工具, AS, Android Studio教程
 title: "Google利器Android Studio从入门到精通"
 categories: [开发工具]
@@ -391,6 +391,30 @@ android {
 gradlew assemblexiaomiRelease就好了。
 
 好了，Gradle的基本情况就说到这，具体可以阅读官网或者查阅其他资料，Gradle的使用需要经验的积累。
+	
+##Android Studio插件安装及使用Genymotion模拟器
+	
+Android Studio自带的模拟器速度已经比Eclipse插件的快一点了，但是还不够暴力，不够爽。现在来说说最暴力的Genymotion模拟器如何结合AS使用。
+首先上[Genymotion官网](http://www.genymotion.com/)下载安装Genymotion，同时你需要在Genymotion官网官网上注册一个账号，这样你才能正常的
+使用Genymotion。
+
+进入AS的Settings界面左侧找到Plugins，点击下图箭头Button（也就是在线安装）：
+
+<img src="http://yanbober.github.io/image/2015-1-28-android_studio_guide_11.png" />
+
+顺便说下上图界面也就是AS安装插件的通用方法，可以看见当前已经安装了的插件，选择在线安装或者从硬盘安装，即针对你已经下载好了的插件，
+可通过这项选择到你下好的插件，进行安装。
+
+如下图所示在1区输入插件名字，2区选中，3区下载安装，然后返回后在AS工具栏上可以看见Genymotion小图标，也就是箭头4指的那个玩意，说明安装OK。
+
+<img src="http://yanbober.github.io/image/2015-1-28-android_studio_guide_12.png" />
+
+接下来就是设置下Genymotion，新建一个虚拟机设备，这是Genymotion的东西，至于怎么弄Step by Step就行，没啥难度。完事点击AS上模拟器图标就可以
+启动使用了，运行AS程序选择模拟器就可以在模拟器看见自己程序了，下图就是Genymotion启动起来的界面。
+
+<img src="http://yanbober.github.io/image/2015-1-28-android_studio_guide_13.png" />
+
+至此快速模拟器Genymotion已经搞定，提升你的速度。其他的插件安装也就触类旁通了。
 	
 ##Android Studio总结
 
