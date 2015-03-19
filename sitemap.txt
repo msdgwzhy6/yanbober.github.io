@@ -1,8 +1,10 @@
----
-# Remember to set production_url in your _config.yml file!
-title : Sitemap
----
-{% for page in site.pages %}
-{{site.production_url}}{{ page.url }}{% endfor %}
-{% for post in site.posts %}
-{{site.production_url}}{{ post.url }}{% endfor %}
+http://yanbober.github.io/about.html
+http://yanbober.github.io/atom.xml
+http://yanbober.github.io/categories.html
+http://yanbober.github.io/index.html
+http://yanbober.github.io/posts.html
+http://yanbober.github.io/resource.html
+http://yanbober.github.io/rss.xml
+http://yanbober.github.io/sitemap.txt
+http://yanbober.github.io/timeline.html
+http://yanbober.github.io/2015/01/28/android_studio_guide
