@@ -1,7 +1,7 @@
 ---
 layout: post
 keywords: Genymotion, Android Studio, Android Studio调试, Android开发工具, AS, Android Studio教程
-description: Android Studio, Android Studio调试, Android开发工具, AS, Android Studio教程
+description: Android Studio工具手把手教程
 title: "Google利器Android Studio从入门到精通"
 categories: [开发工具]
 tags: [Android Studio]
