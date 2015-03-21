@@ -307,6 +307,126 @@ JNI调用所返回的值以确定是否出错，并通过调用函数ExceptionOc
 
 本章讨论JNI如何将Java类型映射到本地C类型。
 
+###基本类型
+
+基本类型和本地等效类型表：
+
+|| *Java类型* || *本地类型* || *说明* ||
+|| boolean || jboolean || 无符号，8位 ||
+|| byte || jbyte || 无符号，8位 ||
+|| char || jchar || 无符号，16位 ||
+|| short || jshort || 有符号，16位 ||
+|| int || jint || 有符号，32位 ||
+|| long || jlong || 有符号，64位 ||
+|| float || jfloat || 32位 ||
+|| double || jdouble || 64位 ||
+|| void || void || N/A ||
+
+为了使用方便，特提供以下定义：
+
+{% highlight ruby %}
+	#define JNI_FALSE 0
+	#define JNI_TRUE 1
+{% endhighlight %}
+
+jsize整数类型用于描述主要指数和大小：
+
+{% highlight ruby %}
+	typedef jint jsize;
+{% endhighlight %}
+
+###引用类型
+
+JNI包含了很多对应于不同Java对象的引用类型。JNI引用类型的组织层次如图所示：
+
+<img src="http://yanbober.github.io/image/2015-2-14-android_studio_jni_1/3.png" />
+
+在C中，所有其它JNI引用类型都被定义为与jobject一样。例如：
+
+{% highlight ruby %}
+typedef jobject jclass;
+{% endhighlight %}
+
+在C++中，JNI引入了虚构类以加强子类关系。例如：
+
+{% highlight ruby %}
+class _jobject {};
+class _jclass : public _jobject {};
+...
+typedef _jobject *jobject;
+typedef _jclass *jclass;
+{% endhighlight %}
+
+###域ID和方法ID
+
+方法ID和域ID是常规的C指针类型：
+
+{% highlight ruby %}
+struct _jfieldID;
+/*不透明结构 */
+typedef struct _jfieldID *jfieldID;
+/* 域 ID */
+struct _jmethodID;
+/* 不透明结构 */
+typedef struct _jmethodID *jmethodID; /* 方法 ID */
+{% endhighlight %}
+
+###值类型
+
+jvalue联合类型在参数数组中用作单元类型。其声明方式如下：
+
+{% highlight ruby %}
+typedef union jvalue {
+	jboolean	z;
+	jbyte	b;
+	jchar	c;
+	jshort	s;
+	jint	i;
+	jlong	j;
+	jfloat	f;
+	jdouble	d;
+	jobject	l;
+} jvalue;
+{% endhighlight %}
+
+###类型签名
+
+JNI使用Java虚拟机的类型签名表述。下表列出了这些类型签名：
+
+|| *类型签名* || *Java 类型* ||
+|| Z || boolean ||
+|| B || byte ||
+|| C || char ||
+|| S || short ||
+|| I || int ||
+|| J || long ||
+|| F || float ||
+|| D || double ||
+|| L fully-qualified-class ; || 全限定的类 ||
+|| [ type || type[] ||
+|| ( arg-types ) ret-type || 方法类型 ||
+
+例如，Java方法：
+
+{% highlight ruby %}
+long f (int n, String s, int[] arr);
+{% endhighlight %}
+
+具有以下类型签名：
+
+{% highlight ruby %}
+(ILjava/lang/String;[I)J
+{% endhighlight %}
+
+###UTF-8字符串
+
+{% highlight ruby %}
+
+{% endhighlight %}
+
+<img src="http://yanbober.github.io/image/2015-2-14-android_studio_jni_1/2.png" />
+
+
 
 
 	（烦请令尊体谅作者劳动成果，转载麻烦声明文章链接。您的声明与讨论是鄙人写作的动力。JNI NDK系列文章依据时间及个人情况持续更新中......）
