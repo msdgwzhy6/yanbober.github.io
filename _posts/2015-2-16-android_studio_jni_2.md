@@ -420,13 +420,838 @@ long f (int n, String s, int[] arr);
 
 ###UTF-8字符串
 
+JNI用UTF-8字符串来表示各种字符串类型。UTF-8字符串和Java虚拟机所使用的一样。UTF-8字符串的编码方式使得仅包含非空ASCII
+字符的字符序列能够按每字符一个字节表示，但是最多只能表示16位的字符。所有在\u0001到\u007F范围内的字符都用单字节表示，
+如下所示：
+	
+	|0|0-6位|
+	
+字节中的七位数据确定了所表示字符的值。空字符 (\u000)和\u0080到\u07FF范围内的字符用一对字节表示， 即x和y，如下所示：
+
+	x：|1|1|0|6-10位|				
+	y：|1|0|0-5位|
+	
+值为((x&0x1f)<<6)+(y&0x3f)的字符需用两个字节表示。\u0800到\uFFFF范围内的字符用三个字节表示，即x，y和z：
+
+	x：|1|1|1|0|12-15位|
+	y：|1|0|6-11位|
+	z：|1|0|0-5位|
+	
+值为((x&0xf)<<12)+(y&0x3f)<<6)+(z&0x3f)的字符需用三个字节表示。
+
+此格式与“标准” UTF-8格式之间有两个区别。第一，空字节(byte)0使用双字节格式进行编码，而不是单字节格式。
+这意味着Java虚拟机的UTF-8字符串不可能有嵌入的空值。第二，只使用单字节、双字节和三字节格式。Java虚拟
+机不能识别更长的UTF-8格式。
+
+<hr>
+
+##JNI函数
+
+本章为JNI函数提供参考信息。其中列出了全部JNI函数，同时也给出了JNI函数表的准确布局。注意：“必须”一词用于约束JNI编程
+人员。例如，当说明某个JNI函数必须接收非空对象时，就应确保不要向该JNI函数传递NULL。这时，JNI实现将无需在该JNI函数中
+执行NULL指针检查。本章的部分资料改编自Netscape的JRI文档。该参考资料按用法对函数进行组织。
+
+###接口函数表
+
+每个函数均可通过JNIEnv参数以固定偏移量进行访问。JNIEnv的类型是一个指针，指向存储全部JNI函数指针的结构。注意：前三项
+留作将来与COM兼容。此外，我们在函数表开头部分也留出来多个NULL项，从而可将将来与类有关的JNI操作添加到FindClass后面，
+而非函数表的末尾。注意，函数表可在所有JNI接口指针间共享。
+
+{% highlight ruby %}
+const struct JNINativeInterface ... = {
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	GetVersion,
+
+	DefineClass,
+	FindClass,
+	NULL,
+	NULL,
+	NULL,
+	GetSuperclass,
+	IsAssignableFrom,
+	NULL,
+
+	Throw,
+	ThrowNew,
+	ExceptionOccurred,
+	ExceptionDescribe,
+	ExceptionClear,
+	FatalError,
+	NULL,
+	NULL,
+
+	NewGlobalRef,
+	DeleteGlobalRef,
+	DeleteLocalRef,
+	IsSameObject,
+	NULL,
+	NULL,
+	AllocObject,
+
+	NewObject,
+	NewObjectV,
+	NewObjectA,
+	GetObjectClass,
+
+	IsInstanceOf,
+
+	GetMethodID,
+
+	CallObjectMethod,
+	CallObjectMethodV,
+	CallObjectMethodA,
+	CallBooleanMethod,
+	CallBooleanMethodV,
+	CallBooleanMethodA,
+	CallByteMethod,
+	CallByteMethodV,
+	CallByteMethodA,
+	CallCharMethod,
+	CallCharMethodV,
+	CallCharMethodA,
+	CallShortMethod,
+	CallShortMethodV,
+	CallShortMethodA,
+	CallIntMethod,
+	CallIntMethodV,
+	CallIntMethodA,
+	CallLongMethod,
+	CallLongMethodV,
+	CallLongMethodA,
+	CallFloatMethod,
+	CallFloatMethodV,
+	CallFloatMethodA,
+	CallDoubleMethod,
+	CallDoubleMethodV,
+	CallDoubleMethodA,
+	CallVoidMethod,
+	CallVoidMethodV,
+	CallVoidMethodA,
+
+	CallNonvirtualObjectMethod,
+	CallNonvirtualObjectMethodV,
+	CallNonvirtualObjectMethodA,
+	CallNonvirtualBooleanMethod,
+	CallNonvirtualBooleanMethodV,
+	CallNonvirtualBooleanMethodA,
+	CallNonvirtualByteMethod,
+	CallNonvirtualByteMethodV,
+	CallNonvirtualByteMethodA,
+	CallNonvirtualCharMethod,
+	CallNonvirtualCharMethodV,
+	CallNonvirtualCharMethodA,
+	CallNonvirtualShortMethod,
+	CallNonvirtualShortMethodV,
+	CallNonvirtualShortMethodA,
+	CallNonvirtualIntMethod,
+	CallNonvirtualIntMethodV,
+	CallNonvirtualIntMethodA,
+	CallNonvirtualLongMethod,
+	CallNonvirtualLongMethodV,
+	CallNonvirtualLongMethodA,
+	CallNonvirtualFloatMethod,
+	CallNonvirtualFloatMethodV,
+	CallNonvirtualFloatMethodA,
+	CallNonvirtualDoubleMethod,
+	CallNonvirtualDoubleMethodV,
+	CallNonvirtualDoubleMethodA,
+	CallNonvirtualVoidMethod,
+	CallNonvirtualVoidMethodV,
+	CallNonvirtualVoidMethodA,
+
+	GetFieldID,
+
+	GetObjectField,
+	GetBooleanField,
+	GetByteField,
+	GetCharField,
+	GetShortField,
+	GetIntField,
+	GetLongField,
+	GetFloatField,
+	GetDoubleField,
+	SetObjectField,
+	SetBooleanField,
+	SetByteField,
+	SetCharField,
+	SetShortField,
+	SetIntField,
+	SetLongField,
+	SetFloatField,
+	SetDoubleField,
+
+	GetStaticMethodID,
+
+	CallStaticObjectMethod,
+	CallStaticObjectMethodV,
+	CallStaticObjectMethodA,
+	CallStaticBooleanMethod,
+	CallStaticBooleanMethodV,
+	CallStaticBooleanMethodA,
+	CallStaticByteMethod,
+	CallStaticByteMethodV,
+	CallStaticByteMethodA,
+	CallStaticCharMethod,
+	CallStaticCharMethodV,
+	CallStaticCharMethodA,
+	CallStaticShortMethod,
+	CallStaticShortMethodV,
+	CallStaticShortMethodA,
+	CallStaticIntMethod,
+	CallStaticIntMethodV,
+	CallStaticIntMethodA,
+	CallStaticLongMethod,
+	CallStaticLongMethodV,
+	CallStaticLongMethodA,
+	CallStaticFloatMethod,
+	CallStaticFloatMethodV,
+	CallStaticFloatMethodA,
+	CallStaticDoubleMethod,
+	CallStaticDoubleMethodV,
+	CallStaticDoubleMethodA,
+	CallStaticVoidMethod,
+	CallStaticVoidMethodV,
+	CallStaticVoidMethodA,
+
+	GetStaticFieldID,
+
+	GetStaticObjectField,
+	GetStaticBooleanField,
+	GetStaticByteField,
+	GetStaticCharField,
+	GetStaticShortField,
+	GetStaticIntField,
+	GetStaticLongField,
+	GetStaticFloatField,
+	GetStaticDoubleField,
+
+	SetStaticObjectField,
+	SetStaticBooleanField,
+	SetStaticByteField,
+	SetStaticCharField,
+	SetStaticShortField,
+	SetStaticIntField,
+	SetStaticLongField,
+	SetStaticFloatField,
+	SetStaticDoubleField,
+
+	NewString,
+	GetStringLength,
+	GetStringChars,
+	ReleaseStringChars,
+	NewStringUTF,
+	GetStringUTFLength,
+	GetStringUTFChars,
+	ReleaseStringUTFChars,
+
+	GetArrayLength,
+
+	NewObjectArray,
+	GetObjectArrayElement,
+	SetObjectArrayElement,
+
+	NewBooleanArray,
+	NewByteArray,
+	NewCharArray,
+	NewShortArray,
+	NewIntArray,
+	NewLongArray,
+	NewFloatArray,
+	NewDoubleArray,
+
+	GetBooleanArrayElements,
+	GetByteArrayElements,
+	GetCharArrayElements,
+	GetShortArrayElements,
+	GetIntArrayElements,
+	GetLongArrayElements,
+	GetFloatArrayElements,
+	GetDoubleArrayElements,
+
+	ReleaseBooleanArrayElements,
+	ReleaseByteArrayElements,
+	ReleaseCharArrayElements,
+	ReleaseShortArrayElements,
+	ReleaseIntArrayElements,
+	ReleaseLongArrayElements,
+	ReleaseFloatArrayElements,
+	ReleaseDoubleArrayElements,
+
+	GetBooleanArrayRegion,
+	GetByteArrayRegion,
+	GetCharArrayRegion,
+	GetShortArrayRegion,
+	GetIntArrayRegion,
+	GetLongArrayRegion,
+	GetFloatArrayRegion,
+	GetDoubleArrayRegion,
+	SetBooleanArrayRegion,
+	SetByteArrayRegion,
+	SetCharArrayRegion,
+	SetShortArrayRegion,
+	SetIntArrayRegion,
+	SetLongArrayRegion,
+	SetFloatArrayRegion,
+	SetDoubleArrayRegion,
+
+	RegisterNatives,
+	UnregisterNatives,
+
+	MonitorEnter,
+	MonitorExit,
+
+	GetJavaVM,
+};
+{% endhighlight %}
+
+###版本信息
+
+####GetVersion 返回本地方法接口的版本。
+
+{% highlight ruby %}
+jint GetVersion(JNIEnv *env);
+{% endhighlight %}
+
+参数
+	env：JNI接口指针。
+	
+返回值：
+	高16位返回主版本号，低16位返回次版本号。
+	在JDK1.1 中，GetVersion()返回0x00010001。
+
+###类操作
+
+####DefineClass 从原始类数据的缓冲区中加载类。
+
+{% highlight ruby %}
+jclass DefineClass(JNIEnv *env, jobject loader, const jbyte *buf, jsize bufLen);
+{% endhighlight %}
+
+参数：
+	env：JNI 接口指针。
+	loader：分派给所定义的类的类加载器。
+	buf：包含.class文件数据的缓冲区。
+	bufLen：缓冲区长度。
+	
+返回值：
+	返回Java类对象。如果出错则返回NULL。
+	
+抛出：
+	ClassFormatError：如果类数据指定的类无效。
+	ClassCircularityError：如果类或接口是自身的超类或超接口。
+	OutOfMemoryError：如果系统内存不足。
+
+####FindClass 该函数用于加载本地定义的类。它将搜索由CLASSPATH环境变量为具有指定名称的类所指定的目录和zip文件。
+
+{% highlight ruby %}
+jclass FindClass(JNIEnv *env, const char *name);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	name：类全名（即包名后跟类名，之间由“/”分隔）。如果该名称以“[”（数组签名字符）打头，则返回一个数组类。
+
+返回值：
+	返回类对象全名。如果找不到该类，则返回NULL。
+
+抛出：
+	ClassFormatError：如果类数据指定的类无效。
+	ClassCircularityError：如果类或接口是自身的超类或超接口。
+	NoClassDefFoundError：如果找不到所请求的类或接口的定义。
+	OutOfMemoryError：如果系统内存不足。
+
+####GetSuperclass 如果clazz代表类而非类object，则该函数返回由clazz所指定的类的超类。如果clazz指定类object或代表某个接口，则该函数返回NULL。
+
+{% highlight ruby %}
+jclass GetSuperclass(JNIEnv *env, jclass clazz);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	clazz：Java类对象。
+	
+返回值：
+	由clazz所代表的类的超类或NULL。
+	
+####IsAssignableFrom 确定clazz1的对象是否可安全地强制转换为clazz2。
+
+{% highlight ruby %}
+jboolean IsAssignableFrom(JNIEnv *env, jclass clazz1, jclass clazz2);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	clazz1：第一个类参数。
+	clazz2：第二个类参数。
+	
+返回值：
+	下列某个情况为真时返回JNI_TRUE：
+		第一及第二个类参数引用同一个Java类。
+		第一个类是第二个类的子类。
+		第二个类是第一个类的某个接口。
+		
+###异常
+
+####Throw 抛出java.lang.Throwable对象。
+
+{% highlight ruby %}
+jint Throw(JNIEnv *env, jthrowable obj);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	obj：java.lang.Throwable对象。
+	
+返回值：
+	成功时返回0，失败时返回负数。
+	
+抛出：
+	java.lang.Throwable对象obj。
+	
+####ThrowNew利用指定类的消息（由message指定）构造异常对象并抛出该异常。
+
+{% highlight ruby %}
+jint ThrowNew(JNIEnv *env, jclass clazz, const char *message);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	clazz：java.lang.Throwable的子类。
+	message：用于构造java.lang.Throwable对象的消息。
+
+返回值：
+	成功时返回0，失败时返回负数。
+	
+抛出：
+	新构造的java.lang.Throwable对象。
+	
+####ExceptionOccurred 确定是否某个异常正被抛出。在平台相关代码调用ExceptionClear()或Java代码处理该异常前，异常将始终保持抛出状态。
+
+{% highlight ruby %}
+jthrowable ExceptionOccurred(JNIEnv *env);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	
+返回值：
+	返回正被抛出的异常对象，如果当前无异常被抛出，则返回NULL。
+	
+####ExceptionDescribe 将异常及堆栈的回溯输出到系统错误报告信道（例如 stderr）。该例程可便利调试操作。
+
+{% highlight ruby %}
+void ExceptionDescribe(JNIEnv *env);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	
+####ExceptionClear 清除当前抛出的任何异常。如果当前无异常，则此例程不产生任何效果。
+
+{% highlight ruby %}
+void ExceptionClear(JNIEnv *env);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	
+####FatalError 抛出致命错误并且不希望虚拟机进行修复。该函数无返回值。
+
+{% highlight ruby %}
+void FatalError(JNIEnv *env, const char *msg);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	msg：错误消息。
+	
+###全局及局部引用
+
+####NewGlobalRef 创建obj参数所引用对象的新全局引用。obj参数既可以是全局引用，也可以是局部引用。全局引用通过调用DeleteGlobalRef()来显式撤消。
+
+{% highlight ruby %}
+jobject NewGlobalRef(JNIEnv *env, jobject obj);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	obj：全局或局部引用。
+
+返回值：
+	返回全局引用。如果系统内存不足则返回NULL。
+	
+####DeleteGlobalRef 删除globalRef所指向的全局引用。
+
+{% highlight ruby %}
+void DeleteGlobalRef(JNIEnv *env, jobject globalRef);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	globalRef：全局引用。
+	
+####DeleteLocalRef 删除localRef所指向的局部引用。
+
+{% highlight ruby %}
+void DeleteLocalRef(JNIEnv *env, jobject localRef);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	localRef：局部引用。
+	
+###对象操作
+
+####AllocObject 分配新Java对象而不调用该对象的任何构造函数。返回该对象的引用。clazz参数务必不要引用数组类。
+
+{% highlight ruby %}
+jobject AllocObject(JNIEnv *env, jclass clazz);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	clazz：Java类对象。
+	
+返回值：
+	返回Java对象。如果无法构造该对象，则返回NULL。
+	
+抛出：
+	InstantiationException：如果该类为一个接口或抽象类。
+	OutOfMemoryError：如果系统内存不足。
+	
+####NewObject NewObjectA NewObjectV 构造新Java对象。
+
+{% highlight ruby %}
+jobject NewObject(JNIEnv *env, jclass clazz, jmethodID methodID, ...);
+jobject NewObjectA(JNIEnv *env, jclass clazz, jmethodID methodID, jvalue *args);
+jobject NewObjectV(JNIEnv *env, jclass clazz, jmethodID methodID, va_list args);
+{% endhighlight %}
+
+方法ID指示应调用的构造函数方法。该ID必须通过调用GetMethodID()获得，且调用时的方法名必须为<init>，
+而返回类型必须为void(V)。clazz参数务必不要引用数组类。
+
+#####NewObject
+
+编程人员应将传递给构造函数的所有参数紧跟着放在methodID参数的后面。NewObject()收到这些参数后，将把它们传给编程人员
+所要调用的Java方法。
+
+#####NewObjectA
+
+编程人员应将传递给构造函数的所有参数放在jvalues类型的数组args中，该数组紧跟着放在methodID参数的后面。NewObject()
+收到数组中的这些参数后，将把它们传给编程人员所要调用的Java方法。
+
+#####NewObjectV
+
+编程人员应将传递给构造函数的所有参数放在va_list类型的参数args中，该参数紧跟着放在methodID参数的后面。NewObject()收到
+这些参数后，将把它们传给编程人员所要调用的Java方法。
+
+参数：
+	env：JNI接口指针。
+	clazz：Java类对象。
+	methodID：构造函数的方法ID。
+
+NewObject 的其它参数：
+	传给构造函数的参数。
+
+NewObjectA的其它参数：
+	args：传给构造函数的参数数组。
+
+NewObjectV的其它参数：
+	args：传给构造函数的参数va_list。
+
+返回值：
+返回Java对象，如果无法构造该对象，则返回NULL。
+
+抛出：
+	InstantiationException：如果该类为接口或抽象类。
+	OutOfMemoryError：如果系统内存不足。
+	构造函数抛出的任何异常。
+
+####GetObjectClass 返回对象的类。
+
+{% highlight ruby %}
+jclass GetObjectClass(JNIEnv *env, jobject obj);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	obj：Java对象（不能为NULL）。
+
+返回值：
+	返回Java类对象。
+
+####IsInstanceOf 测试对象是否为某个类的实例。
+
+{% highlight ruby %}
+jboolean IsInstanceOf(JNIEnv *env, jobject obj, jclass clazz);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	obj：Java对象。
+	clazz：Java类对象。
+	
+返回值：
+	如果可将obj强制转换为clazz，则返回JNI_TRUE。否则返回JNI_FALSE。NULL对象可强制转换为任何类。
+	
+####IsSameObject 测试两个引用是否引用同一Java对象。
+
+{% highlight ruby %}
+jboolean IsSameObject(JNIEnv *env, jobject ref1, jobject ref2);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	ref1：Java对象。
+	ref2：Java对象。
+	
+返回值：
+	如果ref1和ref2引用同一Java对象或均为NULL，则返回JNI_TRUE。否则返回JNI_FALSE。
+
+###访问对象的域
+
+####GetFieldID
+
+{% highlight ruby %}
+jfieldID GetFieldID(JNIEnv *env, jclass clazz, const char *name, const char *sig);
+{% endhighlight %}
+
+返回类的实例（非静态）域的域ID。该域由其名称及签名指定。访问器函数的Get<type>Field及Set<type>Field系列使用域ID检索
+对象域。GetFieldID()将未初始化的类初始化。GetFieldID()不能用于获取数组的长度域。应使用GetArrayLength()。
+
+参数：
+	env：JNI接口指针。
+	clazz：Java类对象。
+	name: 0终结的UTF-8字符串中的域名。
+	sig：0终结的UTF-8字符串中的域签名。
+	
+返回值：
+	域ID。如果操作失败，则返回NULL。
+	
+抛出：
+	NoSuchFieldError：如果找不到指定的域。
+	ExceptionInInitializerError：如果由于异常而导致类初始化程序失败。
+	OutOfMemoryError：如果系统内存不足。
+
+####Get<type>Field例程
+
+{% highlight ruby %}
+NativeType Get<type>Field(JNIEnv *env, jobject obj, jfieldID fieldID);
+{% endhighlight %}
+
+该访问器例程系列返回对象的实例（非静态）域的值。要访问的域由通过调用GetFieldID()而得到的域ID指定。下表说明了
+Get<type>Field例程名及结果类型。应将Get<type>Field中的type替换为域的Java类型（或使用表中的某个实际例程名），
+然后将NativeType替换为该例程对应的本地类型。
+
+|| *Get<type>Field例程名* || *本地类型* ||
+|| GetObjectField() || jobject ||
+|| GetBooleanField() || jboolean ||
+|| GetByteField() || jbyte ||
+|| GetCharField() || jchar ||
+|| GetShortField() || jshort ||
+|| GetIntField() || jint ||
+|| GetLongField() || jlong ||
+|| GetFloatField() || jfloat ||
+|| GetDoubleField() || jdouble ||
+
+参数：
+	env：JNI接口指针。
+	obj：Java对象（不能为 NULL）。
+	fieldID：有效的域ID。
+	
+返回值：
+	域的内容。
+	
+####Set<type>Field例程
+
+{% highlight ruby %}
+void Set<type>Field(JNIEnv *env, jobject obj, jfieldID fieldID, NativeType value);
+{% endhighlight %}
+
+该访问器例程系列设置对象的实例（非静态）域的值。要访问的域由通过调用SetFieldID()而得到的域ID指定。下表说明了
+Set<type>Field例程名及结果类型。应将Set<type>Field中的type替换为域的Java类型（或使用表中的某个实际例程名），
+然后将NativeType替换为该例程对应的本地类型。
+
+|| *Set<type>Field例程名* || *本地类型* ||
+|| SetObjectField() || jobject ||
+|| SetBooleanField() || jboolean ||
+|| SetByteField() || jbyte ||
+|| SetCharField() || jchar ||
+|| SetShortField() || jshort ||
+|| SetIntField() || jint ||
+|| SetLongField() || jlong ||
+|| SetFloatField() || jfloat ||
+|| SetDoubleField() || jdouble ||
+
+参数：
+	env：JNI接口指针。
+	obj：Java对象（不能为NULL）。
+	fieldID：有效的域ID。
+	value：域的新值。
+
+###调用实例方法
+
+####GetMethodID
+
+{% highlight ruby %}
+jmethodID GetMethodID(JNIEnv *env, jclass clazz, const char *name, const char *sig);
+{% endhighlight %}
+
+返回类或接口实例（非静态）方法的方法ID。方法可在某个clazz的超类中定义，也可从clazz继承。该方法由其名称和签名决定。
+GetMethodID()可使未初始化的类初始化。要获得构造函数的方法ID，应将<init>作为方法名，同时将void (V)作为返回类型。
+
+参数：
+	env：JNI接口指针。
+	clazz：Java类对象。
+	name：0终结的UTF-8字符串中的方法名。
+	sig：0终结的UTF-8字符串中的方法签名。
+
+返回值：
+	方法ID，如果找不到指定的方法，则为NULL。
+
+抛出：
+	NoSuchMethodError：如果找不到指定方法。
+	ExceptionInInitializerError：如果由于异常而导致类初始化程序失败。
+	OutOfMemoryError：如果系统内存不足。
+
+####Call<type>Method，Call<type>MethodA，Call<type>MethodV例程
+
+{% highlight ruby %}
+NativeType Call<type>Method(JNIEnv *env, jobject obj, jmethodID methodID, ...);
+NativeType Call<type>MethodA(JNIEnv *env, jobject obj, jmethodID methodID, jvalue *args);
+NativeType Call<type>MethodV(JNIEnv *env, jobject obj, jmethodID methodID, va_list args);
+{% endhighlight %}
+
+这三个操作的方法用于从本地方法调用Java实例方法。它们的差别仅在于向其所调用的方法传递参数时所用的机制。这三个操作将
+根据所指定的方法ID调用Java对象的实例（非静态）方法。参数methodID必须通过调用GetMethodID()来获得。当这些函数用于调用
+私有方法和构造函数时，方法ID必须从obj的真实类派生而来，而不应从其某个超类派生。
+
+#####Call<type>Method例程
+
+编程人员应将要传给方法的所有参数紧跟着放在methodID参数之后。Call<type>Method例程接受这些参数并将其传给编程人员所要
+调用的Java方法。
+
+#####Call<type>MethodA例程
+
+编程人员应将要传给方法的所有参数放在紧跟在methodID参数之后的jvalues类型数组args中。Call<type>MethodA routine接受这些
+数组中的参数并将其传给编程人员所要调用的Java方法。
+
+#####Call<type>MethodV 例程
+
+编程人员将方法的所有参数放在紧跟着在methodID参数之后的va_list类型参数变量中。Call<type>MethodV routine接受这些参数
+并将其传给编程人员所要调用的Java方法。
+
+下表根据结果类型说明了各个方法调用例程。用户应将Call<type>Method中的type替换为所调用方法的Java类型（或使用表中的实际
+方法调用例程名），同时将NativeType替换为该例程相应的本地类型。
+
+|| *Call<type>Method例程名* || *本地类型* ||
+|| CallVoidMethod() CallVoidMethodA() CallVoidMethodV() || void ||
+|| CallObjectMethod() CallObjectMethodA() CallObjectMethodV() || jobject ||
+|| CallBooleanMethod() CallBooleanMethodA() CallBooleanMethodV() || jboolean ||
+|| CallByteMethod() CallByteMethodA() CallByteMethodV() || jbyte ||
+|| CallCharMethod() CallCharMethodA() CallCharMethodV() || jchar ||
+|| CallShortMethod() CallShortMethodA() CallShortMethodV() || jshort ||
+|| CallIntMethod() CallIntMethodA() CallIntMethodV() || jint ||
+|| CallLongMethod() CallLongMethodA() CallLongMethodV() || jlong ||
+|| CallFloatMethod() CallFloatMethodA() CallFloatMethodV() || jfloat ||
+|| CallDoubleMethod() CallDoubleMethodA() CallDoubleMethodV() || jdouble ||
+
+参数：
+	env：JNI接口指针。
+	obj：Java对象。
+	methodID：方法ID。
+	
+Call<type>Method例程的其它参数：
+	要传给Java方法的参数。
+	
+Call<type>MethodA例程的其它参数：
+	args：参数数组。
+	
+Call<type>MethodV例程的其它参数：
+	args：参数的va_list。
+
+返回值：
+	返回调用Java方法的结果。
+
+抛出：
+	执行Java方法时抛出的异常。
+	
+####CallNonvirtual<type>Method，CallNonvirtual<type>MethodA，CallNonvirtual<type>MethodV例程
+
+{% highlight ruby %}
+NativeType CallNonvirtual<type>Method(JNIEnv *env, jobject obj, jclass clazz, jmethodID methodID, ...);
+NativeType CallNonvirtual<type>MethodA(JNIEnv *env, jobject obj, jclass clazz, jmethodID methodID, jvalue *args);
+NativeType CallNonvirtual<type>MethodV(JNIEnv *env, jobject obj, jclass clazz, jmethodID methodID, va_list args);
+{% endhighlight %}
+
+这些操作根据指定的类和方法ID调用某Java对象的实例（非静态）方法。参数methodID必须通过调用clazz类的GetMethodID()获得。
+CallNonvirtual<type>Method和Call<type>Method例程系列并不相同。Call<type>Method例程根据对象的类调用方法，而
+CallNonvirtual<type>Method例程则根据获得方法ID的（由clazz参数指定）类调用方法。方法ID必须从对象的真实类或其某个超类获得。
+
+#####CallNonvirtual<type>Method例程
+
+编程人员应将要传给方法的所有参数紧跟着放在methodID参数之后。CallNonvirtual<type>Method routine接受这些参数并将其传给编
+程人员所要调用的Java方法。
+
+#####CallNonvirtual<type>MethodA例程
+
+编程人员应将要传给方法的所有参数放在紧跟在methodID参数之后的jvalues类型数组args中。
+CallNonvirtual<type>MethodA routine接受这些数组中的参数并将其传给编程人员所要调用的Java方法。
+
+#####CallNonvirtual<type>MethodV例程
+
+编程人员应将要传给方法的所有参数放在紧跟在methodID参数之后的va_list类型参数args中。CallNonvirtualMethodV routine接受
+这些参数并将其传给编程人员所要调用的Java方法。
+
+下表根据结果类型说明了各个方法调用例程。用户应将CallNonvirtual<type>Method中的type替换为所调用方法的Java类型（或使用
+表中的实际方法调用例程名），同时将NativeType替换为该例程相应的本地类型。
+
+|| *CallNonvirtual<type>Method例程名* || *本地类型* ||
+|| CallNonvirtualVoidMethod() CallNonvirtualVoidMethodA() CallNonvirtualVoidMethodV() || void ||
+|| CallNonvirtualObjectMethod() CallNonvirtualObjectMethodA() CallNonvirtualObjectMethodV() || jobject ||
+|| CallNonvirtualBooleanMethod() CallNonvirtualBooleanMethodA() CallNonvirtualBooleanMethodV() || jboolean ||
+|| CallNonvirtualByteMethod() CallNonvirtualByteMethodA() CallNonvirtualByteMethodV() || jbyte ||
+|| CallNonvirtualCharMethod() CallNonvirtualCharMethodA() CallNonvirtualCharMethodV() || jchar ||
+|| CallNonvirtualShortMethod() CallNonvirtualShortMethodA() CallNonvirtualShortMethodV() || jshort ||
+|| CallNonvirtualIntMethod() CallNonvirtualIntMethodA() CallNonvirtualIntMethodV() || jint ||
+|| CallNonvirtualLongMethod() CallNonvirtualLongMethodA() CallNonvirtualLongMethodV() || jlong ||
+|| CallNonvirtualFloatMethod() CallNonvirtualFloatMethodA() CallNonvirtualFloatMethodV() || jfloat ||
+|| CallNonvirtualDoubleMethod() CallNonvirtualDoubleMethodA() CallNonvirtualDoubleMethodV() || jdouble ||
+	
+参数：
+	env：JNI接口指针。
+	clazz：Java类。
+	obj: Java对象。
+	methodID：方法ID。
+	
+CallNonvirtual<type>Method例程的其它参数：
+	要传给Java方法的参数。
+	
+CallNonvirtual<type>MethodA例程的其它参数：
+	args：参数数组。
+	
+CallNonvirtual<type>MethodV例程的其它参数：
+	args：参数的va_list。
+	
+返回值：
+	调用Java方法的结果。
+
+抛出：
+	执行Java方法时所抛出的异常。
+	
+###访问静态域
+
+####
+<img src="http://yanbober.github.io/image/2015-2-14-android_studio_jni_1/2.png" />
+
+
 {% highlight ruby %}
 
 {% endhighlight %}
 
 <img src="http://yanbober.github.io/image/2015-2-14-android_studio_jni_1/2.png" />
-
-
-
 
 	（烦请令尊体谅作者劳动成果，转载麻烦声明文章链接。您的声明与讨论是鄙人写作的动力。JNI NDK系列文章依据时间及个人情况持续更新中......）
