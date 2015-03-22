@@ -1244,7 +1244,32 @@ CallNonvirtual<type>MethodV例程的其它参数：
 	
 ###访问静态域
 
-####
+####GetStaticFieldID
+jfieldID GetStaticFieldID(JNIEnv *env, jclass clazz,
+const char *name, const char *sig);
+返回类的静态域的域 ID。域由其名称和签名指定。GetStatic<type>Field 和
+SetStatic<type>Field 访问器函数系列使用域 ID 检索静态域。
+GetStaticFieldID() 将未初始化的类初始化。
+参数：
+env：JNI 接口指针。
+clazz：Java 类对象。
+name:
+0 终结的 UTF-8 字符串中的静态域名。
+sig：0 终结的 UTF-8 字符串中的域签名。
+返回值：
+域 ID。如果找不到指定的静态域，则为 NULL。
+抛出：
+NoSuchFieldError：如果找不到指定的静态域。
+ExceptionInInitializerError：如果由于异常而导致类初始化程序失败。
+OutOfMemoryError：如果系统内存不足。
+GetStatic<type>Field 例程
+NativeType GetStatic<type>Field(JNIEnv *env, jclass clazz,
+jfieldID fieldID);
+该访问器例程系列返回对象的静态域的值。要访问的域由通过调用
+GetStaticFieldID() 而得到的域 ID 指定。
+下表说明了 GetStatic<type>Field 例程名及结果类型。应将
+GetStatic<type>Field 中的 type 替换为域的 Java 类型（或使用表中的某个
+实际例程名），然后将 NativeType 替换为该例程对应的本地类型。
 <img src="http://yanbober.github.io/image/2015-2-14-android_studio_jni_1/2.png" />
 
 
