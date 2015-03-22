@@ -16,9 +16,9 @@ icon: file-alt
 
 该篇文章完全引用自《JNI完全手册》完整版，用来方便查询查阅，同时作为该系列教程的基础知识。感谢原文档作者。
 
-<hr>
-
-##正文  >>>
+文档所依赖的版本是比较低的，但是恰恰是低版本才能更容易上手学习。文档也有些枯燥，适合开发中参考查询和粗略概况性
+的浏览掌握大局使用，也是下来几篇的基础性指导文档。下来几篇不会再解释代码简单函数释义，只会说重点，遇到不懂的来
+这篇文章搜索函数名即可查阅函数详情。
 
 <hr>
 
@@ -1245,38 +1245,939 @@ CallNonvirtual<type>MethodV例程的其它参数：
 ###访问静态域
 
 ####GetStaticFieldID
-jfieldID GetStaticFieldID(JNIEnv *env, jclass clazz,
-const char *name, const char *sig);
-返回类的静态域的域 ID。域由其名称和签名指定。GetStatic<type>Field 和
-SetStatic<type>Field 访问器函数系列使用域 ID 检索静态域。
-GetStaticFieldID() 将未初始化的类初始化。
-参数：
-env：JNI 接口指针。
-clazz：Java 类对象。
-name:
-0 终结的 UTF-8 字符串中的静态域名。
-sig：0 终结的 UTF-8 字符串中的域签名。
-返回值：
-域 ID。如果找不到指定的静态域，则为 NULL。
-抛出：
-NoSuchFieldError：如果找不到指定的静态域。
-ExceptionInInitializerError：如果由于异常而导致类初始化程序失败。
-OutOfMemoryError：如果系统内存不足。
-GetStatic<type>Field 例程
-NativeType GetStatic<type>Field(JNIEnv *env, jclass clazz,
-jfieldID fieldID);
-该访问器例程系列返回对象的静态域的值。要访问的域由通过调用
-GetStaticFieldID() 而得到的域 ID 指定。
-下表说明了 GetStatic<type>Field 例程名及结果类型。应将
-GetStatic<type>Field 中的 type 替换为域的 Java 类型（或使用表中的某个
-实际例程名），然后将 NativeType 替换为该例程对应的本地类型。
-<img src="http://yanbober.github.io/image/2015-2-14-android_studio_jni_1/2.png" />
-
 
 {% highlight ruby %}
-
+jfieldID GetStaticFieldID(JNIEnv *env, jclass clazz, const char *name, const char *sig);
 {% endhighlight %}
 
-<img src="http://yanbober.github.io/image/2015-2-14-android_studio_jni_1/2.png" />
+返回类的静态域的域ID。域由其名称和签名指定。GetStatic<type>Field和SetStatic<type>Field访问器函数系列使用域ID检索
+静态域。GetStaticFieldID()将未初始化的类初始化。
+
+参数：
+	env：JNI接口指针。
+	clazz：Java类对象。
+	name: 0终结的UTF-8字符串中的静态域名。
+	sig：0终结的UTF-8字符串中的域签名。
+
+返回值：
+	域ID。如果找不到指定的静态域，则为NULL。
+
+抛出：
+	NoSuchFieldError：如果找不到指定的静态域。
+	ExceptionInInitializerError：如果由于异常而导致类初始化程序失败。
+	OutOfMemoryError：如果系统内存不足。
+
+####GetStatic<type>Field例程
+
+{% highlight ruby %}
+NativeType GetStatic<type>Field(JNIEnv *env, jclass clazz, jfieldID fieldID);
+{% endhighlight %}
+
+该访问器例程系列返回对象的静态域的值。要访问的域由通过调用GetStaticFieldID()而得到的域ID指定。下表说明了
+GetStatic<type>Field例程名及结果类型。应将GetStatic<type>Field中的type替换为域的Java类型（或使用表中的某个
+实际例程名），然后将NativeType替换为该例程对应的本地类型。
+
+|| *GetStatic<type>Field例程名* || *本地类型* ||
+|| GetStaticObjectField() || jobject ||
+|| GetStaticBooleanField() || jboolean ||
+|| GetStaticByteField() || jbyte ||
+|| GetStaticCharField() || jchar ||
+|| GetStaticShortField() || jshort ||
+|| GetStaticIntField() || jint ||
+|| GetStaticLongField() || jlong ||
+|| GetStaticFloatField() || jfloat ||
+|| GetStaticDoubleField() || jdouble ||
+
+参数：
+	env：JNI接口指针。
+	clazz：Java类对象。
+	fieldID：静态域ID。
+返回值：
+	静态域的内容。
+	
+####SetStatic<type>Field例程
+
+{% highlight ruby %}
+void SetStatic<type>Field(JNIEnv *env, jclass clazz, jfieldID fieldID, NativeType value);
+{% endhighlight %}
+
+该访问器例程系列设置对象的静态域的值。要访问的域由通过调用GetStaticFieldID()而得到的域ID指定。下表说明了
+SetStatic<type>Field例程名及结果类型。应将SetStatic<type>Field中的type替换为域的Java类型（或使用表中的某个
+实际例程名），然后将NativeType替换为该例程对应的本地类型。
+
+|| *SetStatic<type>Field例程名* || *本地类型* ||
+|| SetStaticObjectField() || jobject ||
+|| SetStaticBooleanField() || jboolean ||
+|| SetStaticByteField() || jbyte ||
+|| SetStaticCharField() || jchar ||
+|| SetStaticShortField() || jshort ||
+|| SetStaticIntField() || jint ||
+|| SetStaticLongField() || jlong ||
+|| SetStaticFloatField() || jfloat ||
+|| SetStaticDoubleField() || jdouble ||
+
+参数：
+	env：JNI接口指针。
+	clazz：Java类对象。
+	fieldID：静态域ID。
+	value：域的新值。
+
+###调用静态方法
+
+####GetStaticMethodID 返回类的静态方法的方法ID。方法由其名称和签名指定。GetStaticMethodID()将未初始化的类初始化。
+
+{% highlight ruby %}
+jmethodID GetStaticMethodID(JNIEnv *env, jclass clazz, const char *name, const char *sig);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	clazz：Java类对象。
+	name：0终结UTF-8字符串中的静态方法名。
+	sig：0终结UTF-8字符串中的方法签名。
+
+返回值：
+	方法ID，如果操作失败，则为NULL。
+
+抛出：
+	NoSuchMethodError：如果找不到指定的静态方法。
+	ExceptionInInitializerError：如果由于异常而导致类初始化程序失败。
+	OutOfMemoryError：如果系统内存不足。
+
+####CallStatic<type>Method，CallStatic<type>MethodA，CallStatic<type>MethodV 例程
+
+{% highlight ruby %}
+NativeType CallStatic<type>Method(JNIEnv *env, jclass clazz, jmethodID methodID, ...);
+NativeType CallStatic<type>MethodA(JNIEnv *env, jclass clazz, jmethodID methodID, jvalue *args);
+NativeType CallStatic<type>MethodV(JNIEnv *env, jclass clazz, jmethodID methodID, va_list args);
+{% endhighlight %}
+
+这些操作将根据指定的方法ID调用Java对象的静态方法。methodID参数必须通过调用GetStaticMethodID()得到。方法ID必须从
+clazz派生，而不能从其超类派生。
+
+#####CallStatic<type>Method例程
+
+编程人员应将要传给方法的所有参数紧跟着放在methodID参数之后。CallStatic<type>Method routine接受这些参数并将其传给
+编程人员所要调用的Java方法。
+
+#####CallStatic<type>MethodA例程
+
+编程人员应将要传给方法的所有参数放在紧跟在methodID参数之后的jvalues类型数组args中。CallStaticMethodA routine接受
+这些数组中的参数并将其传给编程人员所要调用的Java方法。
+
+#####CallStatic<type>MethodV例程
+
+编程人员应将要传给方法的所有参数放在紧跟在methodID参数之后的va_list类型参数args中。CallStaticMethodV routine接受
+这些参数并将其传给编程人员所要调用的Java方法。
+
+下表根据结果类型说明了各个方法调用例程。用户应将CallStatic<type>Method中的type替换为所调用方法的Java类型（或使用
+表中的实际方法调用例程名），同时将NativeType替换为该例程相应的本地类型。
+
+|| *CallStatic<type>Method例程名* || *本地类型* ||
+|| CallStaticVoidMethod() CallStaticVoidMethodA() CallStaticVoidMethodV() || void ||
+|| CallStaticObjectMethod() CallStaticObjectMethodA() CallStaticObjectMethodV() || jobject ||
+|| CallStaticBooleanMethod() CallStaticBooleanMethodA() CallStaticBooleanMethodV() || jboolean ||
+|| CallStaticByteMethod() CallStaticByteMethodA() CallStaticByteMethodV() || jbyte ||
+|| CallStaticCharMethod() CallStaticCharMethodA() CallStaticCharMethodV() || jchar ||
+|| CallStaticShortMethod() CallStaticShortMethodA() CallStaticShortMethodV() || jshort ||
+|| CallStaticIntMethod() CallStaticIntMethodA() CallStaticIntMethodV() || jint ||
+|| CallStaticLongMethod() CallStaticLongMethodA() CallStaticLongMethodV() || jlong ||
+|| CallStaticFloatMethod() CallStaticFloatMethodA() CallStaticFloatMethodV() || jfloat ||
+|| CallStaticDoubleMethod() CallStaticDoubleMethodA() CallStaticDoubleMethodV() || jdouble ||
+	
+参数：
+	env：JNI接口指针。
+	clazz：Java类对象。
+	methodID：静态方法ID。
+	
+CallStatic<type>Method例程的其它参数：
+	要传给静态方法的参数。
+	
+CallStatic<type>MethodA例程的其它参数：
+	args：参数数组。
+	
+CallStatic<type>MethodV例程的其它参数：
+	args：参数的va_list。
+	
+返回值：
+	返回调用静态Java方法的结果。
+	
+抛出：
+	执行Java方法时抛出的异常。
+	
+###字符串操作
+
+####NewString 利用Unicode字符数组构造新的java.lang.String对象。
+
+{% highlight ruby %}
+jstring NewString(JNIEnv *env, const jchar *unicodeChars, jsize len);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	unicodeChars：指向Unicode字符串的指针。
+	len：Unicode字符串的长度。
+
+返回值：
+	Java字符串对象。如果无法构造该字符串，则为NULL。
+
+抛出：
+	OutOfMemoryError：如果系统内存不足。
+	
+####GetStringLength 返回Java字符串的长度（Unicode字符数）。
+
+{% highlight ruby %}
+jsize GetStringLength(JNIEnv *env, jstring string);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	string：Java字符串对象。
+
+返回值：
+	Java 字符串的长度。
+	
+####GetStringChars 返回指向字符串的Unicode字符数组的指针。该指针在调用ReleaseStringchars()前一直有效。如果isCopy非空，则在复制完成后将*isCopy设为JNI_TRUE。如果没有复制，则设为JNI_FALSE。
+
+{% highlight ruby %}
+const jchar * GetStringChars(JNIEnv *env, jstring string, jboolean *isCopy);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	string：Java字符串对象。
+	isCopy：指向布尔值的指针。
+
+返回值：
+	指向Unicode字符串的指针，如果操作失败，则返回NULL。
+
+####ReleaseStringChars 通知虚拟机平台相关代码无需再访问chars。参数chars是一个指针，可通过GetStringChars()从string获得。
+
+{% highlight ruby %}
+void ReleaseStringChars(JNIEnv *env, jstring string, const jchar *chars);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	string：Java字符串对象。
+	chars：指向Unicode字符串的指针。
+	
+####NewStringUTF 利用UTF-8字符数组构造新java.lang.String对象。
+
+{% highlight ruby %}
+jstring NewStringUTF(JNIEnv *env, const char *bytes);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。如果无法构造该字符串，则为NULL。
+	bytes：指向UTF-8字符串的指针。
+
+返回值：
+	Java字符串对象。如果无法构造该字符串，则为NULL。
+
+抛出：
+	OutOfMemoryError：如果系统内存不足。
+
+####GetStringUTFLength 以字节为单位返回字符串的UTF-8长度。
+
+{% highlight ruby %}
+jsize GetStringUTFLength(JNIEnv *env, jstring string);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	string：Java字符串对象。
+
+返回值：
+	返回字符串的UTF-8长度。
+	
+####GetStringUTFChars 返回指向字符串的UTF-8字符数组的指针。该数组在被ReleaseStringUTFChars()释放前将一直有效。如果isCopy不是NULL，*isCopy在复制完成后即被设为JNI_TRUE。如果未复制，则设为JNI_FALSE。
+
+{% highlight ruby %}
+const char* GetStringUTFChars(JNIEnv *env, jstring string, jboolean *isCopy);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	string：Java字符串对象。
+	isCopy：指向布尔值的指针。
+
+返回值：
+	指向UTF-8字符串的指针。如果操作失败，则为NULL。
+
+####ReleaseStringUTFChars 通知虚拟机平台相关代码无需再访问utf。utf参数是一个指针，可利用GetStringUTFChars()从string获得。
+
+{% highlight ruby %}
+void ReleaseStringUTFChars(JNIEnv *env, jstring string, const char *utf);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	string：Java字符串对象。
+	utf：指向UTF-8字符串的指针。
+	
+###数组操作
+
+####GetArrayLength 返回数组中的元素数。
+
+{% highlight ruby %}
+jsize GetArrayLength(JNIEnv *env, jarray array);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	array：Java数组对象。
+	
+返回值：
+	数组的长度。
+	
+####NewObjectArray 构造新的数组，它将保存类elementClass中的对象。所有元素初始值均设为initialElement。
+
+{% highlight ruby %}
+jarray NewObjectArray(JNIEnv *env, jsize length, jclass elementClass, jobject initialElement);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	length：数组大小。
+	elementClass：数组元素类。
+	initialElement：初始值。
+	
+返回值：
+	Java数组对象。如果无法构造数组，则为NULL。
+
+抛出：
+	OutOfMemoryError：如果系统内存不足。
+
+####GetObjectArrayElement 返回Object数组的元素。
+
+{% highlight ruby %}
+jobject GetObjectArrayElement(JNIEnv *env, jobjectArray array, jsize index);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	array：Java数组。
+	index：数组下标。
+
+返回值：
+	Java对象。
+
+抛出：
+	ArrayIndexOutOfBoundsException：如果index不是数组中的有效下标。
+	
+####SetObjectArrayElement 设置Object数组的元素。
+
+{% highlight ruby %}
+void SetObjectArrayElement(JNIEnv *env, jobjectArray array, jsize index, jobject value);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	array：Java数组。
+	index：数组下标。
+	value：新值。
+
+抛出：
+	ArrayIndexOutOfBoundsException：如果index不是数组中的有效下标。
+	ArrayStoreException：如果value的类不是数组元素类的子类。
+
+####New<PrimitiveType>Array例程
+
+{% highlight ruby %}
+ArrayType New<PrimitiveType>Array(JNIEnv *env, jsize length);
+{% endhighlight %}
+
+用于构造新基本类型数组对象的一系列操作。下表说明了特定的基本类型数组构造函数。用户应把New<PrimitiveType>Array替换为
+某个实际的基本类型数组构造函数例程名（见下表），然后将ArrayType替换为该例程相应的数组类型。
+	
+|| *New<PrimitiveType>Array例程* || *数组类型* ||
+|| NewBooleanArray() || jbooleanArray ||
+|| NewByteArray() || jbyteArray ||
+|| NewCharArray() || jcharArray ||
+|| NewShortArray() || jshortArray ||
+|| NewIntArray() || jintArray ||
+|| NewLongArray() || jlongArray ||
+|| NewFloatArray() || jfloatArray ||
+|| NewDoubleArray() || jdoubleArray ||
+
+参数：
+	env：JNI接口指针。
+	length：数组长度。
+
+返回值：
+	Java数组。如果无法构造该数组，则为NULL。
+
+####Get<PrimitiveType>ArrayElements例程
+
+{% highlight ruby %}
+NativeType *Get<PrimitiveType>ArrayElements(JNIEnv *env, ArrayType array, jboolean *isCopy);
+{% endhighlight %}
+
+一组返回基本类型数组体的函数。结果在调用相应的Release<PrimitiveType>ArrayElements()函数前将一直有效。由于返回的数组
+可能是Java数组的副本，因此对返回数组的更改不必在基本类型数组中反映出来，直到调用了
+Release<PrimitiveType>ArrayElements()。如果isCopy不是NULL，*isCopy在复制完成后即被设为JNI_TRUE。如果未复制，则设为JNI_FALSE。
+
+下表说明了特定的基本类型数组元素访问器。应进行下列替换；
+
+1. 将Get<PrimitiveType>ArrayElements替换为表中某个实际的基本类型元素访问器例程名。
+2. 将ArrayType替换为对应的数组类型。
+3. 将NativeType替换为该例程对应的本地类型。
+
+不管布尔数组在Java虚拟机中如何表示，GetBooleanArrayElements()将始终返回一个jbooleans类型的指针，其中每一字节代表一个
+元素（开包表示）。内存中将确保所有其它类型的数组为连续的。
+
+|| *Get<PrimitiveType>ArrayElements例程* || *数组类型* || *本地类型* ||
+|| GetBooleanArrayElements() || jbooleanArray || jboolean ||
+|| GetByteArrayElements() || jbyteArray || jbyte ||
+|| GetCharArrayElements() || jcharArray || jchar ||
+|| GetShortArrayElements() || jshortArray || jshort ||
+|| GetIntArrayElements() || jintArray || jint ||
+|| GetLongArrayElements() || jlongArray || jlong ||
+|| GetFloatArrayElements() || jfloatArray || jfloat ||
+|| GetDoubleArrayElements() || jdoubleArray || jdouble ||
+
+参数：
+	env：JNI接口指针。
+	array：Java字符串对象。
+	isCopy：指向布尔值的指针。
+
+返回值：
+	返回指向数组元素的指针，如果操作失败，则为NULL。
+	
+####Release<PrimitiveType>ArrayElements例程
+
+{% highlight ruby %}
+void Release<PrimitiveType>ArrayElements(JNIEnv *env, ArrayType array, NativeType *elems, jint mode);
+{% endhighlight %}
+
+通知虚拟机平台相关代码无需再访问elems的一组函数。elems参数是一个通过使用对应的Get<PrimitiveType>ArrayElements()函数
+由array导出的指针。必要时，该函数将把对elems的修改复制回基本类型数组。mode参数将提供有关如何释放数组缓冲区的信息。
+如果elems不是array中数组元素的副本，mode将无效。否则，mode将具有下表所述的功能：
+
+|| *基本类型数组释放模* || *动作* ||
+|| 0 || 复制回内容并释放elems缓冲区 ||
+|| JNI_COMMIT || 复制回内容但不释放elems缓冲区 ||
+|| JNI_ABORT || 释放缓冲区但不复制回变化 ||
+
+多数情况下，编程人员将把“0”传给mode参数以确保固定的数组和复制的数组保持一致。其它选项可以使编程人员进一步控制内存
+管理，但使用时务必慎重。下表说明了构成基本类型数组撤消程序系列的特定例程。应进行如下替换；
+
+1. 将Release<PrimitiveType>ArrayElements 替换为下表中的某个实际基本类型数组撤消程序例程名。
+2. 将ArrayType替换为对应的数组类型。
+3. 将NativeType替换为该例程对应的本地类型。
+	
+|| *Release<PrimitiveType>ArrayElements例程* || *数组类型* || *本地类型* ||
+|| ReleaseBooleanArrayElements() || jbooleanArray || jboolean ||
+|| ReleaseByteArrayElements() || jbyteArray || jbyte ||
+|| ReleaseCharArrayElements() || jcharArray || jchar ||
+|| ReleaseShortArrayElements() || jshortArray || jshort ||
+|| ReleaseIntArrayElements() || jintArray || jint ||
+|| ReleaseLongArrayElements() || jlongArray || jlong ||
+|| ReleaseFloatArrayElements() || jfloatArray || jfloat ||
+|| ReleaseDoubleArrayElements() || jdoubleArray || jdouble ||
+
+参数：
+	env：JNI接口指针。
+	array：Java数组对象。
+	elems：指向数组元素的指针。
+	mode：释放模式。
+	
+####Get<PrimitiveType>ArrayRegion例程
+
+{% highlight ruby %}
+void Get<PrimitiveType>ArrayRegion(JNIEnv *env, ArrayType array, jsize start, jsize len, NativeType *buf);
+{% endhighlight %}
+ 
+将基本类型数组某一区域复制到缓冲区中的一组函数。
+下表说明了特定的基本类型数组元素访问器。应进行如下替换：
+
+1. 将Get<PrimitiveType>ArrayRegion替换为表中的某个实际基本类型元素访问器例程名。
+2. 将 ArrayType 替换为对应的数组类型。
+3. 将 NativeType 替换为该例程对应的本地类型。
+	
+|| *Get<PrimitiveType>ArrayRegion例程* || *数组类型* || *本地类型* ||
+|| GetBooleanArrayRegion() || jbooleanArray || jboolean ||
+|| GetByteArrayRegion() || jbyteArray || jbyte ||
+|| GetCharArrayRegion() || jcharArray || jchar ||
+|| GetShortArrayRegion() || jshortArray || jshort ||
+|| GetIntArrayRegion() || jintArray || jint ||
+|| GetLongArrayRegion() || jlongArray || jlong ||
+|| GetFloatArrayRegion() || jfloatArray || jfloat ||
+|| GetDoubleArrayRegion() || jdoubleArray || jdouble ||	
+	
+参数：
+	env：JNI接口指针。
+	array：Java指针。
+	start：起始下标。
+	len：要复制的元素数。
+	buf：目的缓冲区。
+
+抛出：
+	ArrayIndexOutOfBoundsException：如果区域中的某个下标无效。
+
+####Set<PrimitiveType>ArrayRegion例程
+
+{% highlight ruby %}
+void Set<PrimitiveType>ArrayRegion(JNIEnv *env, ArrayType array, jsize start, jsize len, NativeType *buf);
+{% endhighlight %}
+
+将基本类型数组的某一区域从缓冲区中复制回来的一组函数。下表说明了特定的基本类型数组元素访问器。应进行如下替换：
+
+1. 将Set<PrimitiveType>ArrayRegion替换为表中的实际基本类型元素访问器例程名。
+2. 将ArrayType替换为对应的数组类型。
+3. 将NativeType替换为该例程对应的本地类型。	
+	
+|| *Set<PrimitiveType>ArrayRegion例程* || *数组类型* || *本地类型* ||
+|| SetBooleanArrayRegion() || jbooleanArray || jboolean ||
+|| SetByteArrayRegion() || jbyteArray || jbyte ||
+|| SetCharArrayRegion() || jcharArray || jchar ||
+|| SetShortArrayRegion() || jshortArray || jshort ||
+|| SetIntArrayRegion() || jintArray || jint ||
+|| SetLongArrayRegion() || jlongArray || jlong ||
+|| SetFloatArrayRegion() || jfloatArray || jfloat ||
+|| SetDoubleArrayRegion() || jdoubleArray || jdouble ||		
+	
+参数：
+	env：JNI接口指针。
+	array: Java数组。
+	start：起始下标。
+	len：要复制的元素数。
+	buf：源缓冲区。
+
+抛出：
+	ArrayIndexOutOfBoundsException：如果区域中的某个下标无效。	
+
+###注册本地方法
+
+####RegisterNatives
+
+{% highlight ruby %}
+jint RegisterNatives(JNIEnv *env, jclass clazz, const JNINativeMethod *methods, jint nMethods);
+{% endhighlight %}
+
+向clazz参数指定的类注册本地方法。methods参数将指定JNINativeMethod结构的数组，其中包含本地方法的名称、签名和函数指针。
+nMethods参数将指定数组中的本地方法数。JNINativeMethod 结构定义如下所示：
+
+{% highlight ruby %}
+typedef struct {
+	char *name;
+	char *signature;
+	void *fnPtr;
+} JNINativeMethod;
+{% endhighlight %}
+
+函数指针通常必须有下列签名：
+
+{% highlight ruby %}
+ReturnType (*fnPtr)(JNIEnv *env, jobject objectOrClass, ...);
+{% endhighlight %}
+
+参数：
+	env：JNI接口指针。
+	clazz：Java类对象。
+	methods：类中的本地方法。
+	nMethods：类中的本地方法数。
+
+返回值：
+	成功时返回 "0"；失败时返回负数。
+	
+抛出：
+	NoSuchMethodError：如果找不到指定的方法或方法不是本地方法。
+
+####UnregisterNatives
+
+{% highlight ruby %}
+jint UnregisterNatives(JNIEnv *env, jclass clazz);
+{% endhighlight %}
+
+取消注册类的本地方法。类将返回到链接或注册了本地方法函数前的状态。该函数不应在常规平台相关代码中使用。
+相反，它可以为某些程序提供一种重新加载和重新链接本地库的途径。
+
+参数：
+	env：JNI接口指针。
+	clazz：Java类对象。
+
+返回值：
+	成功时返回“0”；失败时返回负数。	
+
+###监视程序操作
+
+####MonitorEnter
+
+{% highlight ruby %}
+jint MonitorEnter(JNIEnv *env, jobject obj);
+{% endhighlight %}
+
+进入与obj所引用的基本Java对象相关联的监视程序。每个Java对象都有一个相关联的监视程序。如果当前线程已经拥有与obj相
+关联的监视程序，它将使指示该线程进入监视程序次数的监视程序计数器增 1。如果与 obj 相关联的监视程序并非由某个线程所
+拥有，则当前线程将变为该监视程序的所有者，同时将该监视程序的计数器设置为 1。如果另一个线程已拥有与 obj 关联的监视
+程序，则在监视程序被释放前当前线程将处于等待状态。监视程序被释放后，当前线程将尝试重新获得所有权。
+
+参数：
+	env：JNI接口指针。
+	obj：常规Java对象或类对象。
+	
+返回值：
+	成功时返回“0”；失败时返回负数。
+
+####MonitorExit
+
+{% highlight ruby %}
+jint MonitorExit(JNIEnv *env, jobject obj);
+{% endhighlight %}
+
+当前线程必须是与obj所引用的基本Java对象相关联的监视程序的所有者。线程将使指示进入监视程序次数的计数器减 1。
+如果计数器的值变为 0，当前线程释放监视程序。
+
+参数：
+	env：JNI接口指针。
+	obj：常规Java对象或类对象。
+	
+返回值：
+	成功时返回“0”；失败时返回负数。
+
+###Java虚拟机接口
+
+####GetJavaVM
+
+{% highlight ruby %}
+jint GetJavaVM(JNIEnv *env, JavaVM **vm);
+{% endhighlight %}
+
+返回与当前线程相关联的Java虚拟机接口（用于调用API中）。结果将放在第二个参数vm所指向的位置。
+
+参数：
+	env：JNI接口指针。
+	vm：指向放置结果的位置的指针。
+
+返回值：
+	成功时返回“0”；失败时返回负数。
+
+<hr>
+
+##调用API	
+
+调用API允许软件厂商将Java虚拟机加载到任意的本地程序中。厂商可以交付支持Java的应用程序，而不必链接Java虚拟机源代码。
+本章首先概述了调用API。然后是所有调用API函数的引用页。若要增强Java虚拟机的嵌入性，可以用几种方式来扩展JDK 1.1.2中
+的调用API。
+
+###概述
+
+以下代码示例说明了如何使用调用API中的函数。在本例中，C++代码创建Java虚拟机并且调用名为Main.test的静态方法。
+为清楚起见，我们略去了错误检查。
+
+{% highlight ruby %}
+	#include <jni.h>
+	/* 其中定义了所有的事项 */
+	...
+	JavaVM *jvm;
+	/* 表示 Java 虚拟机*/
+	JNIEnv *env;
+	/* 指向本地方法接口的指针 */
+	JDK1_1InitArgs vm_args; /* JDK 1.1 虚拟机初始化参数 */
+	vm_args.version = 0x00010001; /* 1.1.2 中新增的：虚拟机版本 */
+	/* 获得缺省的初始化参数并且设置类路径 */
+	JNI_GetDefaultJavaVMInitArgs(&vm_args);
+	vm_args.classpath = ...;
+	/* 加载并初始化 Java 虚拟机，返回env中的JNI 接口指针 */
+	JNI_CreateJavaVM(&jvm, &env, &vm_args);
+	/* 用 JNI 调用 Main.test 方法 */
+	jclass cls = env->FindClass("Main");
+	jmethodID mid = env->GetStaticMethodID(cls, "test", "(I)V");
+	env->CallStaticVoidMethod(cls, mid, 100);
+	/* 结束。*/
+	jvm->DestroyJavaVM();
+{% endhighlight %}
+
+本例使用了API中的三个函数。调用API允许本地应用程序用JNI接口指针来访问虚拟机特性。其设计类似于Netscape的JRI嵌入式
+接口。
+
+####创建虚拟机
+
+JNI_CreateJavaVM()函数加载并初始化Java虚拟机，然后将指针返回到JNI接口指针。调用JNI_CreateJavaVM()的线程被看作主线程。
+
+####连接虚拟机
+
+JNI接口指针(JNIEnv)仅在当前线程中有效。如果另一个线程需要访问Java虚拟机，则该线程首先必须调用AttachCurrentThread()以
+将自身连接到虚拟机并且获得JNI接口指针。连接到虚拟机之后，本地线程的工作方式就与在本地方法内运行的普通Java线程一样了。
+本地线程保持与虚拟机的连接，直到调用DetachCurrentThread()时才断开连接。
+
+####卸载虚拟机
+
+主线程不能自己断开与虚拟机的连接。而是必须调用DestroyJavaVM()来卸载整个虚拟机。
+
+虚拟机等到主线程成为唯一的用户线程时才真正地卸载。用户线程包括Java线程和附加的本地线程。之所以存在这种限制是因为
+Java线程或附加的本地线程可能正占用着系统资源，例如锁，窗口等。虚拟机不能自动释放这些资源。卸载虚拟机时，通过将主
+线程限制为唯一的运行线程，使释放任意线程所占用系统资源的负担落到程序员身上。
+
+###初始化结构
+
+不同的Java虚拟机实现可能会需要不同的初始化参数。很难提出适合于所有现有和将来的Java虚拟机的标准初始化结构。
+作为一种折衷方式，我们保留了第一个域(version)来识别初始化结构的内容。嵌入到JDK 1.1.2中的本地应用程序必须
+将版本域设置为0x00010001。尽管其它实现可能会忽略某些由JDK所支持的初始化参数，我们仍然鼓励虚拟机实现使用与
+JDK一样的初始化结构。0x80000000到0xFFFFFFFF之间的版本号需保留，并且不为任何虚拟机实现所识别。
+
+以下代码显示了初始化JDK 1.1.2中的Java虚拟机所用的结构。
+
+{% highlight ruby %}
+typedef struct JavaVMInitArgs {
+	/* 前两个域在 JDK 1.1 中保留，并在 JDK 1.1.2 中正式引入。*/
+	/* Java 虚拟机版本 */
+	jint version;
+	/* 系统属性。*/
+	char **properties;
+	/* 是否检查 Java 源文件与已编译的类文件之间的新旧关系。*/
+	jint checkSource;
+	/* Java 创建的线程的最大本地堆栈大小。*/
+	jint nativeStackSize;
+	/* 最大 Java 堆栈大小。*/
+	jint javaStackSize;
+	/* 初始堆大小。*/
+	jint minHeapSize;
+	/* 最大堆大小。*/
+	jint maxHeapSize;
+	/* 控制是否校验 Java 字节码：0 无，1 远程加载的代码，2 所有代码。*/
+	jint verifyMode;
+	/* 类加载的本地目录路径。*/
+	const char *classpath;
+	/* 重定向所有虚拟机消息的函数的钩子。*/
+	jint (*vfprintf)(FILE *fp, const char *format, va_list args);
+	/* 虚拟机退出钩子。*/
+	void (*exit)(jint code);
+	/* 虚拟机放弃钩子。*/
+	void (*abort)();
+	/* 是否启用类 GC。*/
+	jint enableClassGC;
+	/* GC 消息是否出现。*/
+	jint enableVerboseGC;
+	/* 是否允许异步 GC。*/
+	jint disableAsyncGC;
+	/* 三个保留的域。*/
+	jint reserved0;
+	jint reserved1;
+	jint reserved2;
+} JDK1_1InitArgs;
+{% endhighlight %}
+
+在JDK 1.1.2中，初始化结构提供了钩子，这样在虚拟机终止时，本地应用程序可以重定向虚拟机消息并获得控制权。当本地线程
+与JDK 1.1.2中的Java虚拟机连接时，以下结构将作为参数进行传递。实际上，本地线程与JDK 1.1.2连接时不需要任何参数。
+JDK1_1AttachArgs 结构仅由C编译器的填充槽组成，而C编译器不允许空结构。
+
+{% highlight ruby %}
+typedef struct JDK1_1AttachArgs {
+	/*
+	* JDK 1.1 不需要任何参数来附加本地线程。此处填充的作用是为了满足不允许空结构的C编译器的要求。
+	*/
+	void *__padding;
+} JDK1_1AttachArgs;
+{% endhighlight %}
+
+###调用API函数
+
+JavaVM类型是指向调用API函数表的指针。以下代码示例显示了这种函数表。
+
+{% highlight ruby %}
+typedef const struct JNIInvokeInterface *JavaVM;
+
+const struct JNIInvokeInterface ... = {
+	NULL,
+	NULL,
+	NULL,
+	DestroyJavaVM,
+	AttachCurrentThread,
+	DetachCurrentThread,
+};
+{% endhighlight %}
+
+注意，JNI_GetDefaultJavaVMInitArgs()、JNI_GetCreatedJavaVMs()和JNI_CreateJavaVM() 这三个调用API函数不是JavaVM函数表
+的一部分。不必先有JavaVM结构，就可以使用这些函数。
+
+####JNI_GetDefaultJavaVMInitArgs
+
+{% highlight ruby %}
+jint JNI_GetDefaultJavaVMInitArgs(void *vm_args);
+{% endhighlight %}
+
+返回Java虚拟机的缺省配置。在调用该函数之前，平台相关代码必须将vm_args->version 域设置为它所期望虚拟机支持的JNI版本。
+在JDK 1.1.2中，必须将vm_args->version设置为0x00010001。（JDK 1.1不要求平台相关代码设置版本域。为了向后兼容性，如果
+没有设置版本域，则JDK 1.1.2假定所请求的版本为0x00010001。JDK的未来版本将要求把版本域设置为适当的值。）该函数返回后，
+将把vm_args->version设置为虚拟机支持的实际JNI版本。
+
+参数：
+	vm_args：指向VM-specific initialization（特定于虚拟机的初始化）结构的指针，缺省参数填入该结构。
+
+返回值：
+	如果所请求的版本得到支持，则返回“0”；如果所请求的版本未得到支持，则返回负数。
+	
+####JNI_GetCreatedJavaVMs
+
+{% highlight ruby %}
+jint JNI_GetCreatedJavaVMs(JavaVM **vmBuf, jsize bufLen, jsize *nVMs);
+{% endhighlight %}
+
+返回所有已创建的Java虚拟机。将指向虚拟机的指针依据其创建顺序写入vmBuf缓冲区。最多写入bufLen项。在*nVMs中返回所创建
+虚拟机的总数。JDK 1.1不支持在单个进程中创建多个虚拟机。
+
+参数：
+	vmBuf：指向将放置虚拟机结构的缓冲区的指针。
+	bufLen：缓冲区的长度。
+	nVMs：指向整数的指针。
+
+返回值：
+	成功时返回“0”；失败则返回负数。
+
+####JNI_CreateJavaVM
+
+{% highlight ruby %}
+jint JNI_CreateJavaVM(JavaVM **p_vm, JNIEnv **p_env, void *vm_args);
+{% endhighlight %}
+
+加载并初始化Java虚拟机。当前线程成为主线程。将env参数设置为主线程的JNI接口指针。JDK 1.1.2不支持在单个进程中创建多个
+虚拟机。必须将vm_args中的版本域设置为0x00010001。
+
+参数：
+	p_vm：指向位置（其中放置所得到的虚拟机结构）的指针。
+	p_env：指向位置（其中放置主线程的 JNI 接口指针）的指针。
+	vm_args: Java 虚拟机初始化参数。
+
+返回值：
+	成功时返回“0”；失败则返回负数。
+
+####DestroyJavaVM
+
+{% highlight ruby %}
+jint DestroyJavaVM(JavaVM *vm);
+{% endhighlight %}
+
+卸载Java虚拟机并回收资源。只有主线程能够卸载虚拟机。调用DestroyJavaVM() 时，主线程必须是唯一的剩余用户线程。
+
+参数：
+	vm：将销毁的Java虚拟机。
+
+返回值：
+	成功时返回“0”；失败则返回负数。
+
+JDK 1.1.2 不支持卸载虚拟机。
+
+####AttachCurrentThread
+
+{% highlight ruby %}
+jint AttachCurrentThread(JavaVM *vm, JNIEnv **p_env, void *thr_args);
+{% endhighlight %}
+
+将当前线程连接到Java虚拟机。在JNIEnv参数中返回JNI接口指针。试图连接已经连接的线程将不执行任何操作。本地线程不能同时
+连接到两个Java虚拟机上。
+
+参数：
+	vm：当前线程所要连接到的虚拟机。
+	p_env：指向位置（其中放置当前线程的 JNI 接口指针）的指针。
+	thr_args：特定于虚拟机的线程连接参数。
+
+返回值：
+	成功时返回“0”；失败则返回负数。
+
+####DetachCurrentThread
+
+{% highlight ruby %}
+jint DetachCurrentThread(JavaVM *vm);
+{% endhighlight %}
+
+断开当前线程与Java虚拟机之间的连接。释放该线程占用的所有Java监视程序。通知所有等待该线程终止的Java线程。主线程
+（即创建Java虚拟机的线程）不能断开与虚拟机之间的连接。作为替代，主线程必须调用JNI_DestroyJavaVM()来卸载整个虚拟机。
+
+参数：
+	vm：当前线程将断开连接的虚拟机。
+
+返回值：
+	成功时返回“0”；失败则返回负数。
+
+####CreateFile
+
+(1)函数原型
+
+{% highlight ruby %}
+HANDLE CreateFile(
+	LPCTSTR lpfileName，
+	DWORD deDesiredAccess,
+	DWORD dwShareMode,
+	LPSECURITY_ATTRIBUTES lpSecurityAttributes
+	DWORD dwCreationDesposition,
+	DWORD dwFlagsAndAtrributes,
+	HANDLE hTemplateFile
+);
+{% endhighlight %}
+
+(2)函数说明
+
+该函数创建、打开或截断一个文件，并返回一个能够被用来存取该文件的句柄。此句柄允许读书据、写数据以及移动文件的指针。
+CreateFile函数既可以做为一个宽自负函数使用，也可以作为一个ANSI函数来用。
+
+(3)参数说明
+
+lpFileName:指向文件字符串的指针。
+dwDesireAccess:制定文件的存取模式，可以取下列值：
+0:制定可以查询对象。
+GENERIC_READ:指定可以从文件中度去数据。
+GENERIC_WRITE:指定可以向文件中写数据。
+dwShareMode:指定文件的共享模式，可以取下列值：
+
+1. 0:不共享。
+2. FILE_SHARE_DELETE:在 Windows NT 系统中，只有为了删除文件而进行的打开操作才会成功。
+3. FILE_SHARE_READ:只有为了从文件中度去数据而进行的打开操作才会成功。
+4. FILE_SHARE_WRITE:只有为了向文件中写数据而进行的打开操作才会成功。
+	
+lpSecurityAttributes:指定文件的安全属性。
+dwCreationDisopsition:指定创建文件的方式，可以取以下值：
+
+1. CREATE_NEW:创建新文件，如果文件已存在，则函数失败。
+2. CREATE_ALWAYS:创建爱内心文件，如果文件已存在，则函数将覆盖并清除旧文件。
+3. OPEN_EXISTING:打开文件，如果文件不存在，函数将失败。
+4. OPEN_ALWAYS:打开文件，如果文件不存在，则函数将创建一个新文件。
+5. TRUNCATE_EXISTING:打开外呢间，如果文件存在，函数将文件的大小设为零，如果文件不存在，函数将失败返回。
+
+dwFlagsAndAtrributes:指定新建文件的属性和标志，它可以取以下值：
+1. FILE_ATTRIBUTE_ARCHIVE:归档属性。
+2. FILE_ATTRIBUTE_HIDDEN:隐藏属性。
+3. FILE_ATTRIBUTE_NORMAL:正常属性。
+4. FILE_ATTRIBUTE_READONLY:只读属性。
+5. FILE_ATTRIBUTE_SYSTEM:系统文件。
+6. FILE_ATTRIBUTE_TEMPORARY:临时存储文件，系统总是将临时文件的所有数据读入内存中，以加速对该文件的访问速度。
+用户应该尽快删除不再使用的临时文件。
+7. FILE_FLAG_OVERLAPPED:用户可以通过一个 OVERLAPPED 结构变量来保存和设置文件读写指针，从而可以完成重叠式的读和写。
+一般用于数量比较大的读些操作。
+
+hTemplateFile:指向一个具有GENERIC_READ属性的文件的句柄，该文件为要创建的文件提供文件属性和文件扩展属性。
+
+(4)注意事项
+
+函数成功将返回指定文件的句柄，否则返回NULL。
+
+(5)典型示例：
+
+{% highlight ruby %}
+	...
+	char szFile[64];
+	HANDLE handle;
+	unsigned long lWritten,lRead;
+	
+	handle = CreateFile("c:\\windows\\desktop\\example.txt",GENERIC_READ|GENERIC_W
+						RITE,FILE_SHARE_READ,NULL,OPEN_ALWAYS,FILE_ATTRIBUTE_NORMAL,0);
+	
+	if(handle==INVALID_HANDLE_VALUE){
+		MessageBox(NULL,"Error Create File!","Error",MB_OK);
+		break;
+	}else
+		MessageBox(NULL,"Open file Success!","Open file",MB_OK);
+		
+{% endhighlight %}
+
+<hr>
+
+##总结
+
+至此整个JNI完全手册引用结束。日后开发过程中该手册相当于一本字典，可以用来查阅。
+
+感谢原中文版手册作者，Admire，向大牛致敬，向开源致敬！
 
 	（烦请令尊体谅作者劳动成果，转载麻烦声明文章链接。您的声明与讨论是鄙人写作的动力。JNI NDK系列文章依据时间及个人情况持续更新中......）
