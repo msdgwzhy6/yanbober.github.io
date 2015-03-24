@@ -1,7 +1,7 @@
 ---
 layout: post
 keywords: Android开发最佳实践
-description: Android 开发最佳实践
+description: Android开发最佳实践
 title: "(转)Android开发最佳实践"
 categories: [项目经验]
 tags: [Android项目经验]
