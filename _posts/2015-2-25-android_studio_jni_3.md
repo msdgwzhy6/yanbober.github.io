@@ -34,7 +34,7 @@ icon: file-alt
 
 <img src="http://yanbober.github.io/image/2015-2-14-android_studio_jni_1/4.png" />
 
-**浅析：**正常NDK工程目录结构，其中jni目录下只是多包涵了两个文件夹而已。在这里在jni根目录下的两个文件就是jni核心文件，起到C与Java的互联互通作用；utils
+浅析：正常NDK工程目录结构，其中jni目录下只是多包涵了两个文件夹而已。在这里在jni根目录下的两个文件就是jni核心文件，起到C与Java的互联互通作用；utils
 目录是我自己加入的一个常用工具目录，里面放置一些通用代码，譬如这里的android_log_print.h用来打印log；local_logic_c目录是我放置的用C语言实现的加密逻辑
 代码，其中包含实现和头文件。你的jni目录结构也可以随意组织，符合自己习惯效率就行。在这里需要注意的一点是Android JNI下面c代码使用printf打印是不显示的，
 所以才需要像我加入的宏，使用android提供的log打印函数，不过在编译时请记得加入log依赖的官方lib。
@@ -67,7 +67,7 @@ public class MainActivity extends ActionBarActivity {
 	
 {% endhighlight %}
 
-**浅析：**这就是App的传统界面了，一个UI传入name="vip"，调运native方法取到转换好的key显示在TextView里，没啥技术难度。
+浅析：这就是App的传统界面了，一个UI传入name="vip"，调运native方法取到转换好的key显示在TextView里，没啥技术难度。
 
 ###io.github.yanbober.ndkapplication包中NdkJniUtils类代码：
 
@@ -85,7 +85,7 @@ public class NdkJniUtils {
 		
 {% endhighlight %}
 
-**浅析：**这个类就是定义本地native方法，编译以后通过javah生成这个文件的h头文件，如下文。其中static块作用就不说了吧。
+浅析：这个类就是定义本地native方法，编译以后通过javah生成这个文件的h头文件，如下文。其中static块作用就不说了吧。
 System.loadLibrary("YanboberJniLibName");就是加载你编译生成的库文件，注意库生成在lib目下默认会添加lib前缀，
 形如：libXxx.so，我们在load函数里传入的名字只需要Xxx就行。
 
@@ -111,7 +111,7 @@ JNIEXPORT jstring JNICALL Java_io_github_yanbober_ndkapplication_NdkJniUtils_gen
 	
 {% endhighlight %}
 
-**浅析：**通过javah生成的头文件，不明白的参考系列教程一中。
+浅析：通过javah生成的头文件，不明白的参考系列教程一中。
 
 ###jni根目录下通过系列教程一中类似test生成的jni接口c文件jni_interface.c内容：
 
@@ -147,7 +147,7 @@ JNIEXPORT jstring JNICALL Java_io_github_yanbober_ndkapplication_NdkJniUtils_gen
 	
 {% endhighlight %}
 
-**浅析：**jni"接口封装实现"文件，我就叫这名吧，可能好理解些，别把jni想的太高大上。这里面就是实现h文件声明的函数。
+浅析：jni"接口封装实现"文件，我就叫这名吧，可能好理解些，别把jni想的太高大上。这里面就是实现h文件声明的函数。
 一些基本参数可以查阅系列教程二文档，复制关键字在教程二里搜索查阅即可。主要流程就是通过GetStringUTFChars拿到java
 传入的String的name转换后的char* utf-8指针；把name通过generateKeyRAS传入C语言实现的加密逻辑代码中处理，同时通过ReleaseStringUTFChars
 告诉虚拟机不需要持有name的引用，以便Java释放String的name；完事将C语言处理生成的key通过NewStringUTF转换返回给java层使用。
@@ -200,7 +200,7 @@ JNIEXPORT jstring JNICALL Java_io_github_yanbober_ndkapplication_NdkJniUtils_gen
 		
 {% endhighlight %}
 
-**浅析：**这个文件是我自己写JNI时每次直接使用的文件，就是一个工具文件一样。目的是因为Android的JNI使用printf函数打印的东西
+浅析：这个文件是我自己写JNI时每次直接使用的文件，就是一个工具文件一样。目的是因为Android的JNI使用printf函数打印的东西
 是没法显示，这里这么转化其实对应的就是java层打印Log的函数Log.d(), Log.i(), Log.w(),Log.e(), Log.f()。原因是因为Android
 的java层和C++ framework层都提供了Log函数，但是JNI环境下打印稍有不同，使用的是__android_log_print并且用NDK环境编译和
 android源码framework环境编译选择链接Android.mk库也不同。所以你会发现Google NDK官方sample代码中也是类似处理的，这里只是
@@ -230,7 +230,7 @@ char* generateKeyRAS(char* name);
 		
 {% endhighlight %}
 
-**浅析：**这就是标准的C语言模块了，这是逻辑的h文件，不解释。
+浅析：这就是标准的C语言模块了，这是逻辑的h文件，不解释。
 
 ###jni目录下local_logic_c子目录中本地C语言实现的逻辑目录下的接口逻辑实现文件easy_encrypt.c内容：
 
@@ -274,7 +274,7 @@ char* generateKeyRAS(char* name)
 
 {% endhighlight %}
 
-**浅析：**这就是标准的C语言模块了，这是逻辑的c文件，模拟实现了加密算法而已。
+浅析：这就是标准的C语言模块了，这是逻辑的c文件，模拟实现了加密算法而已。
 
 ###build.gradle文件中android.defaultConfig中新加如下代码（其他使用AS编译设置参见本系列教程一）：
 
@@ -288,13 +288,13 @@ ndk{
 
 {% endhighlight %}
 
-**浅析：**不解释。
+浅析：不解释。
 
 ###编译代码运行在LogCat中可以看见主要的几条Log如下：
 
 <img src="http://yanbober.github.io/image/2015-2-14-android_studio_jni_1/5.png" />
 
-**浅析：**这里你会看到在运行app时：
+浅析：这里你会看到在运行app时：
 	
 - 尝试加载so文件	Trying to load lib /data/app-lib/io.github.yanbober.ndkapplication-2/libYanboberJniLibName.so 0xa6a4e120
 - 加载了so文件	Added shared lib /data/app-lib/io.github.yanbober.ndkapplication-2/libYanboberJniLibName.so 0xa6a4e120
@@ -306,7 +306,7 @@ ndk{
 
 <img src="http://yanbober.github.io/image/2015-2-14-android_studio_jni_1/6.png" />
 
-**浅析：**传入name加密后得到的key显示。
+浅析：传入name加密后得到的key显示。
 
 <hr>
 
