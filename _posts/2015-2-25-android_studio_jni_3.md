@@ -10,7 +10,7 @@ icon: file-alt
 ---
 {% include site/setup %}
 
-#第一部分
+#**第一部分**
 
 <hr>
 
@@ -283,9 +283,9 @@ ndk{
 	abiFilters "armeabi", "armeabi-v7a", "x86"
 }
 
-浅析：不解释。
-
 {% endhighlight %}
+
+浅析：不解释。
 
 ###编译代码运行在LogCat中可以看见主要的几条Log如下：
 
@@ -311,7 +311,7 @@ ndk{
 
 以上第一部分就是JNI开发常见的基本结构模板，实际开发代码量和文件和目录结构都会比这复杂，这只是一个雏形用来领悟重点。
 
-#第二部分
+#**第二部分**
 
 <hr>
 
@@ -333,28 +333,24 @@ ndk{
 
 PS：咱们上面第一部分就是dvm调用dvmResolveNativeMethod进行动态解析，所以log打印No JNI_OnLoad found。
 
-###从网上查到的深入解析
+###从网上查到的深入解析（引用自网络）
 
-####JNI_OnLoad
+####JNI_OnLoad机制分析
 
 System.loadLibrary调用流程如下所示：
 
-System.loadLibrary->
-   Runtime.loadLibrary->(Java)
-     nativeLoad->(C: java_lang_Runtime.cpp)
-       Dalvik_java_lang_Runtime_nativeLoad->
-          dvmLoadNativeCode-> (dalvik/vm/Native.cpp)
-              1) dlopen(pathName, RTLD_LAZY) (把.so mmap到进程空间，并把func等相关信息填充到soinfo中)
-              2) dlsym(handle, "JNI_OnLoad")
-              3) JNI_OnLoad->
-                      RegisterNatives->
-                         dvmRegisterJNIMethod(ClassObject* clazz, const char* methodName,
-                                                                const char* signature, void* fnPtr)->
-                            dvmUseJNIBridge(method, fnPtr)->  (method->nativeFunc = func)
+System.loadLibrary->Runtime.loadLibrary->(Java)nativeLoad->(C: java_lang_Runtime.cpp)Dalvik_java_lang_Runtime_nativeLoad->dvmLoadNativeCode->(dalvik/vm/Native.cpp)
 
-     JNI函数在进程空间中的起始地址被保存在ClassObject->directMethods中。
+接着如下：
 
-[cpp] view plaincopy
+- dlopen(pathName, RTLD_LAZY) (把.so mmap到进程空间，并把func等相关信息填充到soinfo中)
+- dlsym(handle, "JNI_OnLoad")
+- JNI_OnLoad->RegisterNatives->dvmRegisterJNIMethod(ClassObject* clazz, const char* methodName, const char* signature, void* fnPtr)->dvmUseJNIBridge(method, fnPtr)->(method->nativeFunc = func)
+
+JNI函数在进程空间中的起始地址被保存在ClassObject->directMethods中。
+
+{% highlight ruby %}
+
 struct ClassObject : Object {  
     /* static, private, and <init> methods */  
     int             directMethodCount;  
@@ -363,26 +359,29 @@ struct ClassObject : Object {
     /* virtual methods defined in this class; invoked through vtable */  
     int             virtualMethodCount;  
     Method*         virtualMethods;  
-}  
-    此ClassObject通过gDvm.jniGlobalRefTable或gDvm.jniWeakGlobalRefLock获取。
+}
+
+{% endhighlight %}
+    
+此ClassObject通过gDvm.jniGlobalRefTable或gDvm.jniWeakGlobalRefLock获取。
 
 
 
-3. dvmResolveNativeMethod延迟解析机制
-    如果JNI Lib中没有JNI_OnLoad，即在执行System.loadLibrary时，无法把此JNI Lib实现的函数在进程中的地址增加到ClassObject->directMethods。则直到需要调用的时候才会解析这些javah风格的函数 。这样的函数dvmResolveNativeMethod(dalvik/vm/Native.cpp)来进行解析，其执行流程如下所示：
+####dvmResolveNativeMethod延迟解析机制
 
-void dvmResolveNativeMethod(const u4* args, JValue* pResult,
-          const Method* method, Thread* self)  --> (Resolve a native method and invoke it.)
+如果JNI Lib中没有JNI_OnLoad，即在执行System.loadLibrary时，无法把此JNI Lib实现的函数在进程中的地址增加到ClassObject->directMethods。则直到需要调用的时候才会解析这些javah风格的函数 。这样的函数dvmResolveNativeMethod(dalvik/vm/Native.cpp)来进行解析，其执行流程如下所示：
 
-      1) void* func = lookupSharedLibMethod(method)(根据signature在所有已经打开的.so中寻找此函数实现)
+void dvmResolveNativeMethod(const u4* args, JValue* pResult, const Method* method, Thread* self)->(Resolve a native method and invoke it.)
 
-              dvmHashForeach(gDvm.nativeLibs, findMethodInLib,(void*) method)->
-                   findMethodInLib(void* vlib, void* vmethod)->
-                      dlsym(pLib->handle, mangleCM)
+接着如下：
 
-     2) dvmUseJNIBridge((Method*) method, func);
-     3) (*method->nativeFunc)(args, pResult, method, self);  (调用执行)
-	 
+- void* func = lookupSharedLibMethod(method)(根据signature在所有已经打开的.so中寻找此函数实现)dvmHashForeach(gDvm.nativeLibs, findMethodInLib,(void*) method)->findMethodInLib(void* vlib, void* vmethod)->dlsym(pLib->handle, mangleCM)
+- dvmUseJNIBridge((Method*) method, func)
+- (*method->nativeFunc)(args, pResult, method, self);(调用执行)
+
+##说完蛋疼Load基础后该准么办？
+
+答案就是 
 
 ##总结
 
