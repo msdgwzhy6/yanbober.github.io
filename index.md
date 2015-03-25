@@ -6,10 +6,6 @@ description: 工匠若水的主页-开发者干货分享
 ---
 {% include site/setup %}
 
-<div id="Layer1" style="position:absolute; width:100%; height:100%; z-index:-1">    
-<img src="image/home_bg.jpg" height="100%" width="100%"/>    
-</div>
-
 ## 置顶爆料头条
 
 [安卓5.1隐秘功能曝光：谷歌VPN](http://www.ithome.com/html/android/135181.htm)
