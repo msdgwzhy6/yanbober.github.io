@@ -34,7 +34,7 @@ icon: file-alt
 
 <img src="http://yanbober.github.io/image/2015-2-14-android_studio_jni_1/4.png" />
 
-浅析：正常NDK工程目录结构，其中jni目录下只是多包涵了两个文件夹而已。在这里在jni根目录下的两个文件就是jni核心文件，起到C与Java的互联互通作用；utils
+**浅析：**正常NDK工程目录结构，其中jni目录下只是多包涵了两个文件夹而已。在这里在jni根目录下的两个文件就是jni核心文件，起到C与Java的互联互通作用；utils
 目录是我自己加入的一个常用工具目录，里面放置一些通用代码，譬如这里的android_log_print.h用来打印log；local_logic_c目录是我放置的用C语言实现的加密逻辑
 代码，其中包含实现和头文件。你的jni目录结构也可以随意组织，符合自己习惯效率就行。在这里需要注意的一点是Android JNI下面c代码使用printf打印是不显示的，
 所以才需要像我加入的宏，使用android提供的log打印函数，不过在编译时请记得加入log依赖的官方lib。
@@ -67,7 +67,7 @@ public class MainActivity extends ActionBarActivity {
 	
 {% endhighlight %}
 
-浅析：这就是App的传统界面了，一个UI传入name="vip"，调运native方法取到转换好的key显示在TextView里，没啥技术难度。
+**浅析：**这就是App的传统界面了，一个UI传入name="vip"，调运native方法取到转换好的key显示在TextView里，没啥技术难度。
 
 ###io.github.yanbober.ndkapplication包中NdkJniUtils类代码：
 
@@ -85,7 +85,7 @@ public class NdkJniUtils {
 		
 {% endhighlight %}
 
-浅析：这个类就是定义本地native方法，编译以后通过javah生成这个文件的h头文件，如下文。其中static块作用就不说了吧。
+**浅析：**这个类就是定义本地native方法，编译以后通过javah生成这个文件的h头文件，如下文。其中static块作用就不说了吧。
 System.loadLibrary("YanboberJniLibName");就是加载你编译生成的库文件，注意库生成在lib目下默认会添加lib前缀，
 形如：libXxx.so，我们在load函数里传入的名字只需要Xxx就行。
 
@@ -111,7 +111,7 @@ JNIEXPORT jstring JNICALL Java_io_github_yanbober_ndkapplication_NdkJniUtils_gen
 	
 {% endhighlight %}
 
-浅析：通过javah生成的头文件，不明白的参考系列教程一中。
+**浅析：**通过javah生成的头文件，不明白的参考系列教程一中。
 
 ###jni根目录下通过系列教程一中类似test生成的jni接口c文件jni_interface.c内容：
 
@@ -147,7 +147,7 @@ JNIEXPORT jstring JNICALL Java_io_github_yanbober_ndkapplication_NdkJniUtils_gen
 	
 {% endhighlight %}
 
-浅析：jni"接口封装实现"文件，我就叫这名吧，可能好理解些，别把jni想的太高大上。这里面就是实现h文件声明的函数。
+**浅析：**jni"接口封装实现"文件，我就叫这名吧，可能好理解些，别把jni想的太高大上。这里面就是实现h文件声明的函数。
 一些基本参数可以查阅系列教程二文档，复制关键字在教程二里搜索查阅即可。主要流程就是通过GetStringUTFChars拿到java
 传入的String的name转换后的char* utf-8指针；把name通过generateKeyRAS传入C语言实现的加密逻辑代码中处理，同时通过ReleaseStringUTFChars
 告诉虚拟机不需要持有name的引用，以便Java释放String的name；完事将C语言处理生成的key通过NewStringUTF转换返回给java层使用。
@@ -200,11 +200,14 @@ JNIEXPORT jstring JNICALL Java_io_github_yanbober_ndkapplication_NdkJniUtils_gen
 		
 {% endhighlight %}
 
-浅析：这个文件是我自己写JNI时每次直接使用的文件，就是一个工具文件一样。目的是因为Android的JNI使用printf函数打印的东西
+**浅析：**这个文件是我自己写JNI时每次直接使用的文件，就是一个工具文件一样。目的是因为Android的JNI使用printf函数打印的东西
 是没法显示，这里这么转化其实对应的就是java层打印Log的函数Log.d(), Log.i(), Log.w(),Log.e(), Log.f()。原因是因为Android
 的java层和C++ framework层都提供了Log函数，但是JNI环境下打印稍有不同，使用的是__android_log_print并且用NDK环境编译和
 android源码framework环境编译选择链接Android.mk库也不同。所以你会发现Google NDK官方sample代码中也是类似处理的，这里只是
-简单封装的更实用而已。需要一点C语言知识理解。
+简单封装的更实用而已。需要一点C语言知识理解。如果你喜欢再往深里折腾，那我再提一点吧，那就是自己去android系统源码的
+system/core/include/cutils/log.h去看看吧，如果是在完整源码编译环境下，只要include<utils/Log.h>头文件，就可以直接使用对应的LOGI、LOGD等方法了，
+同时请定义LOG_TAG，LOG_NDEBUG等宏值。哈哈，又扯到系统了。不扯了。反正记得include不同情况下可以有不同的路径h文件，但是本质都是一样的，
+只是封装了而已。
 
 ###jni目录下local_logic_c子目录中本地C语言实现的逻辑目录下的接口头文件easy_encrypt.h内容：
 
@@ -227,7 +230,7 @@ char* generateKeyRAS(char* name);
 		
 {% endhighlight %}
 
-浅析：这就是标准的C语言模块了，这是逻辑的h文件，不解释。
+**浅析：**这就是标准的C语言模块了，这是逻辑的h文件，不解释。
 
 ###jni目录下local_logic_c子目录中本地C语言实现的逻辑目录下的接口逻辑实现文件easy_encrypt.c内容：
 
@@ -271,7 +274,7 @@ char* generateKeyRAS(char* name)
 
 {% endhighlight %}
 
-浅析：这就是标准的C语言模块了，这是逻辑的c文件，模拟实现了加密算法而已。
+**浅析：**这就是标准的C语言模块了，这是逻辑的c文件，模拟实现了加密算法而已。
 
 ###build.gradle文件中android.defaultConfig中新加如下代码（其他使用AS编译设置参见本系列教程一）：
 
@@ -285,13 +288,13 @@ ndk{
 
 {% endhighlight %}
 
-浅析：不解释。
+**浅析：**不解释。
 
 ###编译代码运行在LogCat中可以看见主要的几条Log如下：
 
 <img src="http://yanbober.github.io/image/2015-2-14-android_studio_jni_1/5.png" />
 
-浅析：这里你会看到在运行app时：
+**浅析：**这里你会看到在运行app时：
 	
 - 尝试加载so文件	Trying to load lib /data/app-lib/io.github.yanbober.ndkapplication-2/libYanboberJniLibName.so 0xa6a4e120
 - 加载了so文件	Added shared lib /data/app-lib/io.github.yanbober.ndkapplication-2/libYanboberJniLibName.so 0xa6a4e120
@@ -303,7 +306,7 @@ ndk{
 
 <img src="http://yanbober.github.io/image/2015-2-14-android_studio_jni_1/6.png" />
 
-浅析：传入name加密后得到的key显示。
+**浅析：**传入name加密后得到的key显示。
 
 <hr>
 
@@ -333,7 +336,7 @@ ndk{
 
 PS：咱们上面第一部分就是dvm调用dvmResolveNativeMethod进行动态解析，所以log打印No JNI_OnLoad found。
 
-###从网上查到的深入解析（引用自网络）
+###从网上查到的深入解析（此解析模块代码引用自网络）
 
 ####JNI_OnLoad机制分析
 
@@ -381,7 +384,60 @@ void dvmResolveNativeMethod(const u4* args, JValue* pResult, const Method* metho
 
 ##说完蛋疼Load基础后该准么办？
 
-答案就是 
+答案其实就是推荐Android OS加载JNI Lib的方法的通过JNI_OnLoad。因为通过它你可以干许多自定义的事，譬如实现自己的本地注册等。
+因为在上面的解析中已经看到了JNI_OnLoad->RegisterNatives->...这两个关键方法。具体细节咱们现在再说说。
+
+###先来看JNI_OnLoad函数
+
+JNI_OnLoad()函数主要的用途有两点：
+ 
+- 通知VM此C组件使用的JNI版本。如果你的*.so文件没有提供JNI_OnLoad()函数，VM会默认该*.so使用最老的JNI 1.1版本。
+而新版的JNI做了许多扩充，如果需要使用JNI的新版功能，例如JNI 1.4的java.nio.ByteBuffer, 就必须藉由JNI_OnLoad()函数来告知VM。 
+- 因为VM执行到System.loadLibrary()函数时，会立即先调运JNI_OnLoad()，所以C组件的开发者可以由JNI_OnLoad()来进行C组件内的初期值之设定(Initialization)。
+
+既然有JNI_OnLoad()，那就有相呼应的函数，那就是JNI_OnUnload()，当VM释放JNI组件时会呼叫它，因此在该方法中进行善后清理，资源释放的动作最为合适。
+
+###再来看RegisterNatives函数
+
+在上面第一部分时我们看见通过javah命令生成的io_github_yanbober_ndkapplication_NdkJniUtils.h里函数的名字好长，看着就蛋疼。你肯定也想过怎么这么长，
+而且当有时候项目需求原因导致类名变了的时候，函数名必须一个一个的改，更加蛋疼。我第一次接触时那时候自己经验不足，就遇上了这个蛋疼问题。泪奔啊！
+
+既然这样那就有解决办法的，那就是RegisterNatives大招。接下来来看下这个大招：
+
+App的Java程序寻找c本地方法的过程一般是依赖VM去寻找*.so里的本地函数，如果需要连续调运很多次，每次都要寻找一遍，
+会多花许多时间。因此为了解决这个问题我们可以自行将本地函数向VM进行登记，然后让VM自行调registerNativeMethods()函数。
+
+VM自行调registerNativeMethods()函数的作用主要有两点：　　
+
+- 更加有效率去找到C语言的函数　　
+- 可以在执行期间进行抽换，因为自定义的JNINativeMethod类型的methods[]数组是一个名称-函数指针对照表，在程序执行时，
+可以多次调运registerNativeMethods()函数来更换本地函数指针，从而达到弹性抽换本地函数的效果。
+
+上面提到的JNINativeMethod结构是c/c++方法和Java方法之间映射关系的关键结构，该结构定义在jni.h中，具体定义如下：
+
+{% highlight ruby %}
+typedef struct {   
+	const char* name;//java方法名称   
+	const char* signature; //java方法签名  
+	void*       fnPtr;//c/c++的函数指针  
+} JNINativeMethod; 
+{% endhighlight %}
+
+所谓自定义的JNINativeMethod类型的methods[]数组自然也就类似长下面这样了：
+
+{% highlight ruby %}
+static JNINativeMethod methods[] = {  
+		{"generateKey", "(Ljava/lang/String;)Ljava/lang/String;", (void*)generateKey},  
+}; 
+{% endhighlight %}
+
+好了，该补脑的也差不多了，很空洞很枯燥，空虚寂寞冷啊；接下来进入实战吧，通过对第一部分代码的改变来轻松理解这部分扯淡的内容。
+
+<hr>
+
+##代码实例分析
+
+
 
 ##总结
 
