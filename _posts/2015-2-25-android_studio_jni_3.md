@@ -391,7 +391,7 @@ void dvmResolveNativeMethod(const u4* args, JValue* pResult, const Method* metho
 
 JNI_OnLoad()函数主要的用途有两点：
  
-- 通知VM此C组件使用的JNI版本。如果你的*.so文件没有提供JNI_OnLoad()函数，VM会默认该*.so使用最老的JNI 1.1版本。
+- 通知VM此C组件使用的JNI版本。如果你的.so文件没有提供JNI_OnLoad()函数，VM会默认该.so使用最老的JNI 1.1版本。
 而新版的JNI做了许多扩充，如果需要使用JNI的新版功能，例如JNI 1.4的java.nio.ByteBuffer, 就必须藉由JNI_OnLoad()函数来告知VM。 
 - 因为VM执行到System.loadLibrary()函数时，会立即先调运JNI_OnLoad()，所以C组件的开发者可以由JNI_OnLoad()来进行C组件内的初期值之设定(Initialization)。
 
