@@ -313,8 +313,76 @@ ndk{
 
 #第二部分
 
+<hr>
+
+##概述
+
+如果你已经大致理解掌握了第一部分内容，那基本OK了。接下来要扯蛋的就是第一部分遗留的历史问题和其他提升技能。
+
+首先，不知道还记不记得第一部分编译代码运行在LogCat中可以看见主要的几条Log。“No JNI_OnLoad found......skipping init”这句话是不是还是依旧耿耿于怀呢？
+那么接下来咱们放大招来kill它。
+
+<hr>
+
+##从Load这个蛋疼的词说起
+
+###Android OS加载JNI Lib的方法有两种：
+
+- 通过JNI_OnLoad。
+- 如果JNI Lib实现中没有定义JNI_OnLoad，则dvm调用dvmResolveNativeMethod进行动态解析。
+
+PS：咱们上面第一部分就是dvm调用dvmResolveNativeMethod进行动态解析，所以log打印No JNI_OnLoad found。
+
+###从网上查到的深入解析
+
+####JNI_OnLoad
+
+System.loadLibrary调用流程如下所示：
+
+System.loadLibrary->
+   Runtime.loadLibrary->(Java)
+     nativeLoad->(C: java_lang_Runtime.cpp)
+       Dalvik_java_lang_Runtime_nativeLoad->
+          dvmLoadNativeCode-> (dalvik/vm/Native.cpp)
+              1) dlopen(pathName, RTLD_LAZY) (把.so mmap到进程空间，并把func等相关信息填充到soinfo中)
+              2) dlsym(handle, "JNI_OnLoad")
+              3) JNI_OnLoad->
+                      RegisterNatives->
+                         dvmRegisterJNIMethod(ClassObject* clazz, const char* methodName,
+                                                                const char* signature, void* fnPtr)->
+                            dvmUseJNIBridge(method, fnPtr)->  (method->nativeFunc = func)
+
+     JNI函数在进程空间中的起始地址被保存在ClassObject->directMethods中。
+
+[cpp] view plaincopy
+struct ClassObject : Object {  
+    /* static, private, and <init> methods */  
+    int             directMethodCount;  
+    Method*         directMethods;  
+  
+    /* virtual methods defined in this class; invoked through vtable */  
+    int             virtualMethodCount;  
+    Method*         virtualMethods;  
+}  
+    此ClassObject通过gDvm.jniGlobalRefTable或gDvm.jniWeakGlobalRefLock获取。
 
 
+
+3. dvmResolveNativeMethod延迟解析机制
+    如果JNI Lib中没有JNI_OnLoad，即在执行System.loadLibrary时，无法把此JNI Lib实现的函数在进程中的地址增加到ClassObject->directMethods。则直到需要调用的时候才会解析这些javah风格的函数 。这样的函数dvmResolveNativeMethod(dalvik/vm/Native.cpp)来进行解析，其执行流程如下所示：
+
+void dvmResolveNativeMethod(const u4* args, JValue* pResult,
+          const Method* method, Thread* self)  --> (Resolve a native method and invoke it.)
+
+      1) void* func = lookupSharedLibMethod(method)(根据signature在所有已经打开的.so中寻找此函数实现)
+
+              dvmHashForeach(gDvm.nativeLibs, findMethodInLib,(void*) method)->
+                   findMethodInLib(void* vlib, void* vmethod)->
+                      dlsym(pLib->handle, mangleCM)
+
+     2) dvmUseJNIBridge((Method*) method, func);
+     3) (*method->nativeFunc)(args, pResult, method, self);  (调用执行)
+	 
 
 ##总结
 
