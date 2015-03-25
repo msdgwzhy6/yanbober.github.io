@@ -378,7 +378,7 @@ void dvmResolveNativeMethod(const u4* args, JValue* pResult, const Method* metho
 
 接着如下：
 
-- void* func = lookupSharedLibMethod(method)(根据signature在所有已经打开的.so中寻找此函数实现)dvmHashForeach(gDvm.nativeLibs, findMethodInLib,(void*) method)->findMethodInLib(void* vlib, void* vmethod)->dlsym(pLib->handle, mangleCM)
+- void* func = lookupSharedLibMethod(method)(根据signature在所有已经打开的.so中寻找此函数实现)dvmHashForeach(gDvm.nativeLibs, findMethodInLib,(void\*) method)->findMethodInLib(void\* vlib, void\* vmethod)->dlsym(pLib->handle, mangleCM)
 - dvmUseJNIBridge((Method*) method, func)
 - (*method->nativeFunc)(args, pResult, method, self);(调用执行)
 
