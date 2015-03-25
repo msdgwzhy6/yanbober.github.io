@@ -19,11 +19,16 @@ icon: file-alt
 不要一下子被这么几个文件吓着了。重点是为了通过这个例子引出来几个Android NDK开发的重要基础模板知识点。
 所以内在代码逻辑看上去可能十分僵硬不合理，代码风格可能也不是十分规范，还请多多指点交流，然后撸的更多。
 
-这篇文章想了想还是先上结构和源码，然后后面分析内容。
+需要知识点：C语言基础，C语言动态参数宏，Java基础，JNI基本概念
+
+这篇文章想了想还是先上结构和源码，然后后面分析内容。在阅读时可以大致浏览前边代码跳到后面分析开始看，边看边回头看代码。
 
 <hr>
 
 ##代码及工程文件介绍
+
+这个例子是一个简单的场景模拟实现；我们通过在app java层传入一个name到c库中，c库通过app传入的name经过保密的自定义加密算法（本代码没实现，只是模拟）
+处理生成一个客户化定制的key反馈给app层使用。这样至于通过name得到key的具体加密机制被编译成了so文件，很难被破解。而如果使用java则很容易被破解。
 
 这是这篇文章要介绍的代码工程的几个主要文件夹文件分布情况：
 
@@ -177,7 +182,7 @@ jni目录下utils子目录下的log打印工具宏android_log_print.h文件内�
 		
 {% endhighlight %}
 
-jni目录下local_logic_c本地C语言实现的逻辑目录下的接口头文件easy_encrypt.h内容：
+jni目录下local_logic_c子目录中本地C语言实现的逻辑目录下的接口头文件easy_encrypt.h内容：
 
 {% highlight ruby %}
 
@@ -198,7 +203,7 @@ char* generateKeyRAS(char* name);
 		
 {% endhighlight %}
 
-jni目录下local_logic_c本地C语言实现的逻辑目录下的接口逻辑实现文件easy_encrypt.c内容：
+jni目录下local_logic_c子目录中本地C语言实现的逻辑目录下的接口逻辑实现文件easy_encrypt.c内容：
 
 {% highlight ruby %}
 
@@ -216,7 +221,7 @@ char* generateKeyRAS(char* name)
 {
     //判断形参是否有效
     if (NULL == name || strlen(name) > KEY_NAME_SIZE) {
-//        printf("function generateKey must have a ok name!\n");
+		LOGD("function generateKey must have a ok name!\n");
         return NULL;
     }
 
@@ -236,6 +241,18 @@ char* generateKeyRAS(char* name)
     }
 
     return temp;
+}
+
+{% endhighlight %}
+
+build.gradle文件中android.defaultConfig中新加如下代码（其他使用AS编译设置参见本系列教程一）：
+
+{% highlight ruby %}
+
+ndk{
+	moduleName "YanboberJniLibName"
+	ldLibs "log", "z", "m"	//添加依赖库文件，因为有log打印等
+	abiFilters "armeabi", "armeabi-v7a", "x86"
 }
 
 {% endhighlight %}
