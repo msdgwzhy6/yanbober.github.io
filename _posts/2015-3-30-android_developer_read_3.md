@@ -18,7 +18,9 @@ icon: file-alt
 原文重点摘要：
 
 You can create a new shared preference file or access an existing one by calling one of two methods:
+
 - getSharedPreferences() — Use this if you need multiple shared preference files identified by name, which you specify with the first parameter. You can call this from any Context in your app.
+
 - getPreferences() — Use this from an Activity if you need to use only one shared preference file for the activity. Because this retrieves a default shared preference file that belongs to the activity, you don't need to supply a name.
 
 Context.MODE_PRIVATE | MODE_WORLD_READABLE | MODE_WORLD_WRITEABLE
@@ -26,7 +28,9 @@ Context.MODE_PRIVATE | MODE_WORLD_READABLE | MODE_WORLD_WRITEABLE
 精髓指点：
 
 可以通过两个方法拿到SharedPreferences的handle。他们区别是：
+
 - 一个是activity的方法，不需要名字，默认为Activity类名。
+
 - 一个是Context的方法，需要名字，没有默认值。
 
 都可以设置Context的读写权限为三者之一或者组合。
@@ -87,7 +91,9 @@ permission to read and write files in its internal storage directory.
 原文重点摘要：
 
 When saving a file to internal storage, you can acquire the appropriate directory as a File by calling oneof two methods:
+
 - getFilesDir()    Returns a File representing an internal directory for your app.
+
 - getCacheDir()    Returns a File representing an internal directory for your app's temporary cache files. 
 Be sure to delete each file once it is no longer needed and implement a reasonable size limit for the amount
 of memory you use at any given time, such as 1MB. If the system begins running low on storage, it may delete
@@ -97,6 +103,7 @@ To create a new file in one of these directories, you can use the File() constru
 passing the File provided by one of the above methods that specifies your internal storage directory. 
 
 For example:
+
 {% highlight ruby %}
 File file = new File(context.getFilesDir(), filename);
 {% endhighlight %}
@@ -187,6 +194,7 @@ public boolean isExternalStorageReadable() {
 
 Although the external storage is modifiable by the user and other apps,
 there are two categories of files you might save here:
+
 - Public files    Files that should be freely available to other apps and to the user. 
 When the user uninstalls your app, these files should remain available to the user.
 For example, photos captured by your app or other downloaded files.
@@ -204,20 +212,27 @@ For example, additional resources downloaded by your app or temporary media file
 你应该依据你的需求选择哪种外部存储。
 
 ####访问外部存储的权限
+
 - Android1.0开始，写操作受权限WRITE_EXTERNAL_STORAGE保护。
+
 - Android 4.1开始，读操作受权限READ_EXTERNAL_STORAGE保护，上文也可以看出来。
+
 - Android 4.4开始，应用可以管理在它外部存储上的特定包名目录，而不用获取WRITE_EXTERNAL_STORAGE权限。
 
 例子：比如我的小米平板里，一个包名为com.telent.mobileqq的应用，可以自由访问外存上的Android/data/com.telent.mobileqq/目录。
 
 ####注意事项
+
 - 外部存储对数据提供的保护较少，所以系统不应该存储敏感数据在外部存储上。
+
 - 特别是你的应用配置和log文件应该存储在内部存储中，这样它们可以被有效地保护。
 
 对于多用户的情况，一般每个用户都会有自己独立的外部存储，应用仅对当前用户的外部存储有访问权限。
 
 正如上面英文原文说的public和private：
+
 - Context.getExternalFilesDir返回的目录下应该放应用私有的文件，在应用被卸载的时候，系统会清理的就是这个目录。
+
 - getExternalStoragePublicDirectory(String)放一些共享文件。
 
 getExternalStoragePublicDirectory(String type)这个方法接收一个参数，表明目录所放的文件的类型，
@@ -229,6 +244,7 @@ getExternalStoragePublicDirectory(String type)这个方法接收一个参数，�
 getExternalFilesDir(String)或者getExternalCacheDir()，它们不需要获取权限。 
 
 ####Environment API的目录
+
 - getDataDirectory()：用户数据目录。
 - getDownloadCacheDirectory()：下载缓存内容目录。
 - getExternalStorageDirectory()：主要的外部存储目录。
