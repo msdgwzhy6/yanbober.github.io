@@ -2,7 +2,7 @@
 layout: post
 keywords: Android Developer
 description: Android Developer读书笔记
-title: "Building Your First App & Adding the ActionBar"
+title: "[Training] Building Your First App & Adding the ActionBar"
 categories: [开发文档]
 tags: [Android读书笔记]
 group: archive
