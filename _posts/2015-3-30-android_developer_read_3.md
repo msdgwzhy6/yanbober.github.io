@@ -2,7 +2,7 @@
 layout: post
 keywords: Android Developer
 description: Android Developer读书笔记
-title: "[Training] Saving Data"
+title: "[Training] Saving Data & Interacting with Other Apps"
 categories: [开发文档]
 tags: [Android读书笔记]
 group: archive
@@ -12,6 +12,8 @@ icon: file-alt
 <hr>
 重读Android Developer笔记核心记录
 <hr>
+
+#**Saving Data**
 
 ##**Saving Key-Value Sets**
 
@@ -290,3 +292,120 @@ public final class FeedReaderContract {
 精髓指点：
 
 通过实现BaseColumns接口，内部类可以继承一个主键字段名为_ID接口，但这可以防止名字写错误操作。
+
+#**Interacting with Other Apps**
+
+##**Sending the User to Another App**
+
+原文重点摘要：
+
+{% highlight ruby %}
+Intent calendarIntent = new Intent(Intent.ACTION_INSERT, Events.CONTENT_URI);
+Calendar beginTime = Calendar.getInstance().set(2012, 0, 19, 7, 30);
+Calendar endTime = Calendar.getInstance().set(2012, 0, 19, 10, 30);
+calendarIntent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginTime.getTimeInMillis());
+calendarIntent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime.getTimeInMillis());
+calendarIntent.putExtra(Events.TITLE, "Ninja class");
+calendarIntent.putExtra(Events.EVENT_LOCATION, "Secret dojo");
+{% endhighlight %}
+
+This intent for a calendar event is supported only with API level 14 and higher.
+
+精髓指点：
+
+日历Intent这种写法必须是API 14以上才能使用。
+
+原文重点摘要：
+
+It's important that you define your Intent to be as specific as possible. For example,
+if you want to display an image using the ACTION_VIEW intent, you should specify a MIME type of image/*.
+This prevents apps that can "view" other types of data (like a map app) from being triggered by the intent.
+
+精髓指点：
+
+你应该尽可能详细定义你的意图，譬如图像查看intent，你最好加上MIME类型。
+
+##**Verify There is an App to Receive the Intent**
+
+原文重点摘要：
+
+If you invoke an intent and there is no app available on the device that can handle the intent, your app will crash.
+You should perform this check when your activity first starts in case you need to disable the feature that uses the
+intent before the user attempts to use it. If you know of a specific app that can handle the intent, you can also
+provide a link for the user to download the app.
+
+{% highlight ruby %}
+PackageManager packageManager = getPackageManager();
+List activities = packageManager.queryIntentActivities(intent,
+        PackageManager.MATCH_DEFAULT_ONLY);
+boolean isIntentSafe = activities.size() > 0;
+{% endhighlight %}
+
+精髓指点：
+
+非常重要：当你启动一个intent时最好先check这个intent，否则如果不存在你的应用会被crash。你也可以在不存在时告诉他你知道的
+可以响应你intent的app的market链接。
+
+##**Show an App Chooser**
+
+原文重点摘要：
+
+{% highlight ruby %}
+Intent intent = new Intent(Intent.ACTION_SEND);
+...
+
+// Always use string resources for UI text.
+// This says something like "Share this photo with"
+String title = getResources().getString(R.string.chooser_title);
+// Create intent to show chooser
+Intent chooser = Intent.createChooser(intent, title);
+
+// Verify the intent will resolve to at least one activity
+if (intent.resolveActivity(getPackageManager()) != null) {
+    startActivity(chooser);
+}
+{% endhighlight %}
+
+精髓指点：
+
+通过上面的chooser可以设置title等。
+
+##**Allowing Other Apps to Start Your Activity**
+
+原文重点摘要：
+
+If you don't need to declare specifics about the data Uri (such as when your activity handles to other kind of "extra" data,
+instead of a URI), you should specify only the android:mimeType attribute to declare the type of data your activity handles,
+such as text/plain or image/jpeg.
+
+all implicit intents are defined with CATEGORY_DEFAULT by default. In order to receive implicit intents,
+you must include the CATEGORY_DEFAULT category in the intent filter. The methods startActivity() and startActivityForResult()
+treat all intents as if they declared the CATEGORY_DEFAULT category. If you do not declare it in your intent filter,
+no implicit intents will resolve to your activity.
+
+{% highlight ruby %}
+<activity android:name="ShareActivity">
+    <!-- filter for sending text; accepts SENDTO action with sms URI schemes -->
+    <intent-filter>
+        <action android:name="android.intent.action.SENDTO"/>
+        <category android:name="android.intent.category.DEFAULT"/>
+        <data android:scheme="sms" />
+        <data android:scheme="smsto" />
+    </intent-filter>
+    <!-- filter for sending text or images; accepts SEND action and text or image data -->
+    <intent-filter>
+        <action android:name="android.intent.action.SEND"/>
+        <category android:name="android.intent.category.DEFAULT"/>
+        <data android:mimeType="image/*"/>
+        <data android:mimeType="text/plain"/>
+    </intent-filter>
+</activity>
+{% endhighlight %}
+
+精髓指点：
+
+如果你的应用处理的data不是URI以外的，你仅仅只需要指定android:mimeType。一个隐式intent必须声明CATEGORY_DEFAULT。因为调运方默认就加了
+这个category。
+
+
+
