@@ -10,19 +10,11 @@ description: 工匠若水的主页-开发者干货分享
 
 [安卓5.1隐秘功能曝光：谷歌VPN](http://www.ithome.com/html/android/135181.htm)
 
-## Android开发
+## 设计模式优秀博客直通车
 
-[主页建设中...](http://www.baidu.com)
+[友情链接 卡奴达摩的专栏](http://blog.csdn.net/zhengzhb/article/category/926691/)
 
-[主页建设中...](http://www.baidu.com)
-
-## 其他开发
-
-[主页建设中...](http://www.baidu.com)
-
-[主页建设中...](http://www.baidu.com)
-
-## 大牛博客直通车
+## Android优秀博客直通车
 
 [友情链接 《第一行代码》郭林老师CSDN博客主页](http://blog.csdn.net/guolin_blog?viewmode=contents)
 

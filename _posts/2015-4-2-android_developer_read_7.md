@@ -293,7 +293,13 @@ such as setting the orientation to landscape when printing a photo that is in th
 
 精髓指点：
 
+当你应用程序直接管理打印过程时，接收到来自用户打印请求后的第一步是连接到Android print framework并且获得到PrintManager类的一个实例。
+这个类可以初始化一个打印任务并开始打印过程的生命周期。上面的代码演示了如何获取打印管理器，并开始打印过程。
 
+上面的代码演示了如何命名一个打印任务，并得到PrintDocumentAdapter的实例来处理打印的生命周期。
+打印适配器类的实现将在下一节中讨论。
+
+在print（）方法的最后一个参数需要一个PrintAttributes对象。你可以使用该参数改善了用户体验。您也可以使用此参数来设置打印的内容选项，如打印照片方向。
 
 ##**Create a Print Adapter**
 
@@ -327,7 +333,18 @@ For example, you can encapsulate the layout or print document writing work in se
 
 精髓指点：
 
+一个打印适配器可以用来与Android打印框架交互处理一些步骤。我们需要在创建要打印的文档之前让用户选择打印机和打印选项，
+这些选择可以影响用户最终输出的方式，譬如不同的页面大小，或不同的页面方向。一旦用户点击打印按钮以后，框架需要的最终打印文件将会传递给打印设备输出。
+在打印过程中，用户可以选择取消打印，同时你的打印适配器必须监听和响应取消的请求。
 
+PrintDocumentAdapter抽象类是专门用来处理打印生命周期的，它有四个主要的回调方法。你必须执行，以便与打印框架交互：
+
+- onStart() - 在打印过程开始时调用一次。
+- onLayout() - 当页面大小或者方向等变化时调用。
+- onWrite() - onLayout（）调用之后此方法可被调一次或多次。
+- onFinish() - 在打印过程结束时调用一次。
+
+注意：这些适配器的方法在应用程序的主线程中执行。
 
 ####**Compute print document info**
 
@@ -402,6 +419,8 @@ private int computePageCount(PrintAttributes printAttributes) {
 {% endhighlight %}
 
 精髓指点：
+
+上面代码展示了onLayout（）方法的实现。
 
 ####**Write a print document file**
 
@@ -484,6 +503,8 @@ For more information about working with execution threads like asynchronous task
 
 精髓指点：
 
+上面代码展示了如何使用PrintedPdfDocument类创建一个PDF文件。
+
 ##**Drawing PDF Page Content**
 
 原文重点摘要：
@@ -526,4 +547,4 @@ Make sure that you account for the unprintable edges of the page when you build 
 
 精髓指点：
 
-
+如上代码暂时还没琢磨明白其作用。
