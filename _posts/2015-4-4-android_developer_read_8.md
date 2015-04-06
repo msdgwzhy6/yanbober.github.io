@@ -13,6 +13,8 @@ icon: file-alt
 重读Android Developer笔记核心记录
 <hr>
 
+#**Loading Large Bitmaps Efficiently**
+
 原文重点摘要：
 
 There are a number of reasons why loading bitmaps in your Android application is tricky:
@@ -34,8 +36,6 @@ on-screen at once with many more potentially off-screen ready to show at the fli
 - 系统对每个应用都有一个内存限制，通常是16M，但是不同设备也不一定，需要依据系统客户化决定，目的就是为了在屏幕尺寸、密度上显示的更加好。
 - Bitmap需要很多内存，尤其是富图片。
 - 当手指滑动时ListView、GridView、ViewPager等都需要多次重加载其内部图片，所以也很容易溢出。
-
-#**Loading Large Bitmaps Efficiently**
 
 原文重点摘要：
 
@@ -911,6 +911,7 @@ static int getBytesPerPixel(Config config) {
 
 精髓指点：
 
+如上就是高版本的Bitmap的处理方式。
 
 <hr>
 
@@ -923,6 +924,8 @@ showing you how to load multiple bitmaps into ViewPager and GridView components 
 while dealing with concurrency and configuration changes.
 
 精髓指点：
+
+这一节是综合实战，讲述了ViewPager and GridView的图片显示，还有config发生变化的处理。
 
 ##**Load Bitmaps into a ViewPager Implementation**
 
@@ -1095,6 +1098,13 @@ Putting all these pieces together gives you a responsive ViewPager implementatio
 to do as much or as little background processing on your images as needed.
 
 精髓指点：
+
+在ViewPager使用时，若果图片较多推荐使用FragmentStatePagerAdapter，较少且固定推荐使用FragmentPagerAdapter。
+
+如上第一段代码就是一个简单的例子。
+第二段代码是ViewPager内部每个item的Fragment实现例子。
+第三段代码是将ImageView挪动到异步加载处理模式的例子。
+第四段代码是带缓存的加载例子。
 
 ##**Load Bitmaps into a GridView Implementation**
 
@@ -1273,4 +1283,9 @@ In the background task you can load images from the network or resize large digi
 For a full example of this and other concepts discussed in this lesson, please see the included sample application.
 
 精髓指点：
+
+如上第一段代码就是实现了Fragment里显示GridView，GridView的item均为Image的例子。
+第二段代码展示了GridView异步加载图片的方式。
+
+如上的例子在Listview等也是类比实现的。可以好好琢磨下官方的这种实现方式。
 
