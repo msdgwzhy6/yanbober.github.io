@@ -208,6 +208,8 @@ as well as defining a triangle and a square.
 
 精髓指点：
 
+在不了解OpenGL ES情况下绘制OpenGL ES图形是有些棘手的。这节课解释了OpenGL ES相对于Android屏幕的坐标，定义形状，形状面的基础知识，以及定义一个三角形和正方形。
+
 ##**Define a Triangle**
 
 原文重点摘要：
@@ -262,6 +264,12 @@ For more information about faces and culling, see the OpenGL ES developer guide.
 
 精髓指点：
 
+OpenGL ES允许你定义绘图三维坐标。所以在你绘制一个三角形之前你必须先定义它的坐标，在OpenGL中典型的做法就是定义一个浮点型的坐标数组。
+最高效率的做法就是把这些坐标写入ByteBuffer，然后直接传递到OpenGL ES图形管道进行处理。
+
+默认情况下OpenGL ES把GLSurfaceView的中心点当作[0,0,0]，右上角是[1,1,0]，左下角是[-1,-1,0]。具体图形表示参见OpenGL ES developer guide。
+
+这里的图形的坐标定义是逆时针顺序的。绘制的顺序是非常重要的，因为它定义了哪边是图形的前面、后面等等的信息。
 
 ##**Define a Square**
 
@@ -319,6 +327,11 @@ In general, you use collections of triangles to draw objects. In the next lesson
 
 精髓指点：
 
+定义一个三角形非常easy，如果你想复杂点可以绘制一个矩形，典型的OpenGL ES绘制矩形做法是画两个三角形，如上图所示。
+一样的模式，你需要逆时针方向定义两个三角形坐标然后放入ByteBuffer。防止绘制多次我们可以创建一个绘制列表告诉OpenGL ES绘制这些点的顺序。
+
+如上代码就是一个矩形的绘制坐标定义。
+
 <hr>
 
 #**Drawing Shapes**
@@ -332,6 +345,8 @@ because the API provides a great deal of control over the graphics rendering pip
 This lesson explains how to draw the shapes you defined in the previous lesson using the OpenGL ES 2.0 API.
 
 精髓指点：
+
+定义shape后就该drawn了，使用OpenGL ES 2.0绘制图形比你想象中的代码量要多些，因为API提供了大量的图形绘制渲染管道。
 
 ##**Initialize Shapes**
 
