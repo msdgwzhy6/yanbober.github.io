@@ -2,7 +2,7 @@
 layout: post
 keywords: Acache, 框架, 缓存
 description: Android ACache轻缓存分析
-title: "[Training] ASimpleCache开源库使用分析"
+title: "ASimpleCache开源库使用分析"
 categories: [开源框架库笔记]
 tags: [ACache, 缓存]
 group: archive

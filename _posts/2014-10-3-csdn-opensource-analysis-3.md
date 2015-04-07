@@ -2,7 +2,7 @@
 layout: post
 keywords: Volley, 框架, Android HTTP
 description: Google Android Volley网络库
-title: "[Training] Volley使用之自定义"
+title: "Google Volley使用之自定义"
 categories: [开源框架库笔记]
 tags: [Volley, Android网络请求]
 group: archive
