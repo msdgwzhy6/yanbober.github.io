@@ -4,11 +4,20 @@ title: 工匠若水
 keywords: 晏博, 工匠若水, android, java, C语言, PHP, 脚本, android developer, android开发, android技术分享, 极客
 description: 工匠若水的主页-开发者干货分享
 ---
+
 {% include site/setup %}
+
+<hr>
+**欢迎使劲戳右上方指点我的博客文章！！！**
+<hr>
 
 ## 置顶爆料头条
 
 [安卓5.1隐秘功能曝光：谷歌VPN](http://www.ithome.com/html/android/135181.htm)
+
+## Java语言优秀博客直通车
+
+[友情链接  zhangerqing的CSDN博客](http://blog.csdn.net/zhangerqing?viewmode=contents)
 
 ## 设计模式优秀博客直通车
 
@@ -20,7 +29,9 @@ description: 工匠若水的主页-开发者干货分享
 
 [友情链接 《Android系统源代码情景分析》罗升阳老师CSDN博客主页 ](http://blog.csdn.net/luoshengyang?viewmode=contents)
 
+[友情链接  鸿洋的CSDN博客主页](http://blog.csdn.net/lmj623565791)
 
+[友情链接  夏安明的CSDN博客主页](http://blog.csdn.net/xiaanming)
 
 
 ## 移动设备浏览我的主页请扫描如下二维码:
