@@ -377,6 +377,9 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
 精髓指点：
 
+在你绘制之前你必须先把他加载进来。除非你使用的是原始坐标，
+否则你应该初始化内存和onSurfaceCreated（）方法。
+
 ##**Draw a Shape**
 
 原文重点摘要：
@@ -415,6 +418,15 @@ public class Triangle {
 
 精髓指点：
 
+使用OpenGL ES 2.0绘图需要大量的代码，尤其是你需要定义许多关于渲染的细节，尤其是如下需要考虑：
+
+- Vertex Shader    图形渲染的顶点。
+- Fragment Shader      OpenGL ES代码呈现的形状与颜色或纹理。
+- Program     一个OpenGL ES对象包含您想要使用着色器来画一个或多个形状。
+
+你至少需要一个顶点来画一个形状和颜色。这些着色器必须执行，然后添加到一个OpenGL ES项目，然后使用它来画出形状。
+上面例子就是如何定义基本的着色器可以用来画一个三角形的形状类。
+
 原文重点摘要：
 
 Shaders contain OpenGL Shading Language (GLSL) code that must be compiled prior to using it in the OpenGL ES environment.
@@ -436,6 +448,8 @@ public static int loadShader(int type, String shaderCode){
 {% endhighlight %}
 
 精髓指点：
+
+着色器包含OpenGL着色语言(GLSL)代码，必须在OpenGL ES环境中使用它。为了编译这段代码创建了如上一个实用程序方法在渲染器类中。
 
 原文重点摘要：
 
@@ -475,6 +489,11 @@ public class Triangle() {
 {% endhighlight %}
 
 精髓指点：
+
+为了绘制你的形状，你必须编译shader代码，将其添加到OpenGL ES的程序对象，然后链接程序。添加在你绘制的对象的构造函数，所以只进行一次。
+
+注：编译的OpenGL ES着色器和链接程序是非常耗费CPU资源的。
+如果你不知道你的着色器在运行时的内容，你应该建立自己的代码，这样，他们只得到创建一次，然后缓存以备以后使用。
 
 原文重点摘要：
 
@@ -533,6 +552,13 @@ public void onDrawFrame(GL10 unused) {
 
 精髓指点：
 
+此时，您已经准备好添加实际的方法绘制你的形状。绘制形状使用OpenGL ES需要指定几个参数来告诉你要画什么渲染管线以及如何绘制。
+由于绘图选项可以通过形状有所不同，故一个不错的选择就是它可以让你的形状类包含自己绘制的逻辑。
+
+创建draw（）方法绘制形状。此代码设置了位置和颜色值形状的顶点着色器和片段着色器，然后执行该绘图功能。
+
+一旦你有了所有这些代码，画这个对象只需要在内部渲染器的onDrawFrame()方法中调运draw方法即可。
+
 原文重点摘要：
 
 When you run the application, it should look something like this:
@@ -548,6 +574,10 @@ Lastly, the triangle is stationary, which is a bit boring. In the Adding Motion 
 you make this shape rotate and make more interesting use of the OpenGL ES graphics pipeline.
 
 精髓指点：
+
+如上图所示就是运行结果。
+有几个问题与此代码示例有关。首先，它是不会打动你的朋友。其次，三角形是有点压扁，并改变形状，当您更改设备的屏幕方向。
+最后，三角形是固定的，这是一个有点无聊。
 
 <hr>
 
@@ -570,6 +600,20 @@ or might change dynamically based on user actions or your application’s functi
 This lesson describes how to create a projection and camera view and apply it to shapes drawn in your GLSurfaceView.
 
 精髓指点：
+
+在OpenGL ES的环境下，投影和摄像头的意见让你显示的方式，更像绘制的对象
+你怎么看你的眼睛物理对象。这种模拟实际观看的，是用绘制的对象坐标的数学转换：
+
+- 投影 - 这种变换调整基于在那里它们被显示在GLSurfaceView的宽度和高度绘制的对象的坐标。
+没有这样的计算，通过的OpenGL ES绘制的对象是由视图窗口的不等比例偏斜。
+投影转换通常只拥有OpenGL的看法的比例建立或onSurfaceChanged改变时，要计算（）
+您的渲染方法。有关的OpenGL ES的预测更多的信息和坐标映射，见贴图坐标为绘制的对象。
+- 相机视图 - 这个转变调整基于虚拟相机的位置绘制的对象的坐标。
+重要的是要注意的OpenGL ES并没有定义一个实际的摄像头的对象，而是提供了模拟摄像机转化的实用方法
+绘制的对象的显示。当您建立GLSurfaceView摄影机视图转换可能只计算一次，
+或者可以根据用户的操作或应用程序的功能动态变化。
+
+这节课介绍如何创建一个投影和相机视图，并将其应用于形状你GLSurfaceView绘制。
 
 ##**Define a Projection**
 
@@ -605,6 +649,13 @@ In general, you must also apply a camera view transformation in order for anythi
 
 精髓指点：
 
+用于投影变换的数据，计算在GLSurfaceView.Renderer类的onSurfaceChanged（）方法。
+示例代码展示了获取GLSurfaceView的高度和宽度，并用它来填充投影变换矩阵使用Matrix.frustumM（）方法。
+
+此代码填充一个投影矩阵，mProjectionMatrix然后您可以用相机视图改造结合起来，在onDrawFrame（）方法，其示于下一部分。
+
+注：在应用了投影变换图形对象通常会导致一个很空的显示。在一般情况下，还必须以应用摄影机视图转换为任何显示在屏幕上。
+
 ##**Define a Camera View**
 
 原文重点摘要：
@@ -629,6 +680,9 @@ public void onDrawFrame(GL10 unused) {
 {% endhighlight %}
 
 精髓指点：
+
+完成加入一个摄像机视图变换为在渲染绘制过程的一部分转化的绘制的对象的过程。在示例代码，相机视图变换是使用Matrix.setLookAtM（）方法来计算，然后结合先前计算的投影矩阵。
+将合并的变换矩阵然后被传递给绘制的形状。
 
 ##**Apply Projection and Camera Transformations**
 
@@ -688,6 +742,12 @@ Now that you have an application that displays your shapes in correct proportion
 
 精髓指点：
 
+为了使用投影和相机视图变换矩阵中显示预览部分，首先添加一个矩阵变量三角形的顶点着色器之前定义的类。
+
+接着，修改图形对象的绘制（）方法来接受的组合转换矩阵，并将其应用到形状。
+
+一旦你正确计算和应用的投影和相机视图变换，您的图形对象绘制在正确的比例，应该是上图所示的。
+
 <hr>
 
 #**Adding Motion**
@@ -701,6 +761,11 @@ three dimensions or in other unique ways to create compelling user experiences.
 In this lesson, you take another step forward into using OpenGL ES by learning how to add motion to a shape with rotation.
 
 精髓指点：
+
+在屏幕上绘图对象是OpenGL的一个非常基本的功能，但你可以用其他Android图形framwork类做到这一点，
+包括Canvas和可绘制对象。
+
+在这一课中，你采取的又一步骤迈进使用OpenGL ES通过学习如何添加运动的形状与旋转。
 
 ##**Rotate a Shape**
 
@@ -736,6 +801,12 @@ make sure you have commented out the GLSurfaceView.RENDERMODE_WHEN_DIRTY setting
 
 精髓指点：
 
+旋转使用OpenGL ES2.0图形对象是相对简单的。
+在您的渲染器，创建另一个转换矩阵（旋转矩阵），然后用你的投影和相机视图变换矩阵结合起来。
+
+如果你的三角形不进行这些更改后旋转，
+请确保您已注释掉GLSurfaceView.RENDERMODE_WHEN_DIRTY设置，如下一节中所述。
+
 ##**Enable Continuous Rendering**
 
 原文重点摘要：
@@ -758,6 +829,11 @@ Be ready to uncomment this code, because the next lesson makes this call applica
 
 精髓指点：
 
+如果你已经努力遵守与此类中的示例代码这一点，确保你注释掉设置渲染模式只画脏当行，
+否则的OpenGL旋转的形状只有一个增量，然后从GLSurfaceView容器等待调用requestRender（）。
+
+除非你有对象没有改变任何用户交互，它通常是一个好主意，有这个标志打开。
+准备取消注释此代码，因为下一课，使这个调用适用一次。
 
 <hr>
 
@@ -772,6 +848,12 @@ touch interactive is expanding your implementation of GLSurfaceView to override 
 This lesson shows you how to listen for touch events to let users rotate an OpenGL ES object.
 
 精髓指点：
+
+使物体按照像旋转的三角形预设程序是得到一些有用的注意移动，
+但如果你想拥有的用户与你的OpenGL ES图形交互是什么？关键让你的OpenGL ES应用程序
+触摸交互式扩大您的实现GLSurfaceView的覆盖的onTouchEvent（）来监听触摸事件。
+
+这节课向您展示如何监听触摸事件，让用户旋转一个OpenGL ES对象。
 
 ##**Setup a Touch Listener**
 
@@ -824,6 +906,9 @@ public boolean onTouchEvent(MotionEvent e) {
 
 精髓指点：
 
+为了使你的OpenGL ES应用程序响应触摸事件，则必须实现在GLSurfaceView类的onTouchEvent（）方法。
+下面的示例实现演示了如何监听MotionEvent.ACTION_MOVE事件，并将其转化为旋转的形状的角度。
+
 原文重点摘要：
 
 Notice that after calculating the rotation angle, this method calls requestRender() to tell the renderer that it is time to render the frame.
@@ -840,6 +925,11 @@ public MyGLSurfaceView(Context context) {
 {% endhighlight %}
 
 精髓指点：
+
+注意，计算所述旋转角度后，这个方法调用requestRender（）来告诉它是时间来呈现该帧的渲染器。
+这种方法是最有效的在本实施例中，因为该帧不需要重新绘制，除非是在旋转的变化。
+但是，它不会对效率产生任何影响，除非你还要求渲染器时使用setRenderMode（）方法中的数据变化不仅重绘，
+所以一定要确保此行是注释掉的渲染器，而且已经被打开。
 
 ##**Expose the Rotation Angle**
 
@@ -866,6 +956,10 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 {% endhighlight %}
 
 精髓指点：
+
+上面的示例代码，您需要添加一个公共成员暴露通过你的渲染器的旋转角度。
+由于渲染代码是在一个单独的线程应用程序的主用户界面线程中运行，
+您必须声明这个公共变量波动。如上代码声明了变量和getter和setter对。
 
 ##**Apply Rotation**
 
@@ -895,6 +989,8 @@ public void onDrawFrame(GL10 gl) {
 
 精髓指点：
 
+以应用通过触摸输入产生的旋转，注释生成一个角度的代码，并添加裂伤，它包含了触摸产生的输入角度。
+
 原文重点摘要：
 
 When you have completed the steps described above, run the program and drag your finger over the screen to rotate the triangle:
@@ -903,3 +999,4 @@ When you have completed the steps described above, run the program and drag your
 
 精髓指点：
 
+当您完成上述步骤后，运行该程序，并拖动你的手指在屏幕旋转的三角形。
