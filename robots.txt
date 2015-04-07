@@ -1,3 +1,0 @@
-User-agent: *
-Disallow:
-Sitemap: https://yanbober.github.io/sitemap.txt
