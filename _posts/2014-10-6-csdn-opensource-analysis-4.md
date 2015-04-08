@@ -38,6 +38,10 @@ cache线程会亲自解析相应内容，并分发到主线程（UI）。
 第一个可用的net线程会从NetworkQueue中拿出一个request扔向服务器。
 当响应数据到的时候，这个net线程会解析原始响应数据，写入缓存，并把解析后的结果返回给主线程。
 
+<hr>
+
+##**硬着头皮开始吧**
+
 直接这么看好空洞，所以直接把clone的工程导入IDE边看代码边看这个图吧。
 
 还是按照前边的顺序分析吧，使用Volley的第一步首先是通过Volley.newRequestQueue(context)得到RequestQueue队列，
@@ -125,8 +129,7 @@ public void start() {
 
 	// Create network dispatchers (and corresponding threads) up to the pool size.
 	for (int i = 0; i < mDispatchers.length; i++) {
-		NetworkDispatcher networkDispatcher = new NetworkDispatcher(mNetworkQueue, mNetwork,
-				mCache, mDelivery);
+		NetworkDispatcher networkDispatcher = new NetworkDispatcher(mNetworkQueue, mNetwork, mCache, mDelivery);
 		mDispatchers[i] = networkDispatcher;
 		networkDispatcher.start();
 	}
@@ -274,7 +277,6 @@ public void run() {
 					}
 				});
 			}
-
 		} catch (InterruptedException e) {
 			// We may have been interrupted because it was time to quit.
 			if (mQuit) {
@@ -286,10 +288,297 @@ public void run() {
 }
 {% endhighlight %}
 
-{% highlight ruby %}
+首先通过Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);设置线程优先级，然后通过mCache.initialize();
+初始化缓存块，其中mCache是由Volley.java中的newRequestQueue(Context context, HttpStack stack)方法中实例化传入的，其
+Cache接口的实现为new DiskBasedCache(cacheDir)，其中cacheDir默认在Volley.java中不设置为/data/data/app-package/cache/volley/。
+接下来由while (true)可以发现缓存线程是一直在执行，其中通过mQuit标记进制是否结束线程的操作。
+mCacheQueue.take()从阻塞队列获取最前面的一个request，没有request就阻塞等待。
+接着通过mCache.get(request.getCacheKey());尝试从缓存中取出响应结果，
+如何为空的话则把这条请求加入到网络请求队列中，如果不为空的话再判断该缓存是否已过期，
+如果已经过期了则同样把这条请求加入到网络请求队列中，否则就认为不需要重发网络请求，
+直接使用缓存中的数据即可。
+在这个过程中调运了parseNetworkResponse()方法来对数据进行解析，再往后就是将解析出来的数据进行回调了。现在先来看下
+Request抽象基类的这部分代码：
 
+{% highlight ruby %}
+/**
+ * Subclasses must implement this to parse the raw network response
+ * and return an appropriate response type. This method will be
+ * called from a worker thread.  The response will not be delivered
+ * if you return null.
+ * @param response Response from the network
+ * @return The parsed response, or null in the case of an error
+ */
+abstract protected Response<T> parseNetworkResponse(NetworkResponse response);
 {% endhighlight %}
 
-{% highlight ruby %}
+通过注释可以看到他就是一个解析模块的功能。
 
+上面说了，当调用了Volley.newRequestQueue(context)之后，就会有五个线程一直在后台运行，不断等待网络请求的到来，
+其中一个CacheDispatcher是缓存线程，四个NetworkDispatcher是网络请求线程。CacheDispatcher的run方法刚才已经大致分析了，解析来看下
+NetworkDispatcher中是怎么处理网络请求队列的，具体代码如下所示：
+
+{% highlight ruby %}
+@Override
+public void run() {
+	Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+	while (true) {
+		long startTimeMs = SystemClock.elapsedRealtime();
+		Request<?> request;
+		try {
+			// Take a request from the queue.
+			request = mQueue.take();
+		} catch (InterruptedException e) {
+			// We may have been interrupted because it was time to quit.
+			if (mQuit) {
+				return;
+			}
+			continue;
+		}
+
+		try {
+			request.addMarker("network-queue-take");
+
+			// If the request was cancelled already, do not perform the
+			// network request.
+			if (request.isCanceled()) {
+				request.finish("network-discard-cancelled");
+				continue;
+			}
+
+			addTrafficStatsTag(request);
+
+			// Perform the network request.
+			NetworkResponse networkResponse = mNetwork.performRequest(request);
+			request.addMarker("network-http-complete");
+
+			// If the server returned 304 AND we delivered a response already,
+			// we're done -- don't deliver a second identical response.
+			if (networkResponse.notModified && request.hasHadResponseDelivered()) {
+				request.finish("not-modified");
+				continue;
+			}
+
+			// Parse the response here on the worker thread.
+			Response<?> response = request.parseNetworkResponse(networkResponse);
+			request.addMarker("network-parse-complete");
+
+			// Write to cache if applicable.
+			// TODO: Only update cache metadata instead of entire record for 304s.
+			if (request.shouldCache() && response.cacheEntry != null) {
+				mCache.put(request.getCacheKey(), response.cacheEntry);
+				request.addMarker("network-cache-written");
+			}
+
+			// Post the response back.
+			request.markDelivered();
+			mDelivery.postResponse(request, response);
+		} catch (VolleyError volleyError) {
+			volleyError.setNetworkTimeMs(SystemClock.elapsedRealtime() - startTimeMs);
+			parseAndDeliverNetworkError(request, volleyError);
+		} catch (Exception e) {
+			VolleyLog.e(e, "Unhandled exception %s", e.toString());
+			VolleyError volleyError = new VolleyError(e);
+			volleyError.setNetworkTimeMs(SystemClock.elapsedRealtime() - startTimeMs);
+			mDelivery.postError(request, volleyError);
+		}
+	}
+}
 {% endhighlight %}
+
+和CacheDispatcher差不多，如上可以看见一个类似的while(true)循环，说明网络请求线程也是在不断运行的。
+如上通过mNetwork.performRequest(request);代码来发送网络请求，而Network是一个接口，这里具体的实现之前已经分析是BasicNetwork，
+所以先看下它的performRequest()方法，如下所示：
+
+NetWork接口的代码：
+
+{% highlight ruby %}
+public interface Network {
+	/**
+	* Performs the specified request.
+	* @param request Request to process
+	* @return A {@link NetworkResponse} with data and caching metadata; will never be null
+	* @throws VolleyError on errors
+	*/
+	public NetworkResponse performRequest(Request<?> request) throws VolleyError;
+}
+{% endhighlight %}
+
+上面说了，就是执行指定的请求。他的BasicNetwork实现子类如下：
+
+{% highlight ruby %}
+@Override
+public NetworkResponse performRequest(Request<?> request) throws VolleyError {
+	long requestStart = SystemClock.elapsedRealtime();
+	while (true) {
+		HttpResponse httpResponse = null;
+		byte[] responseContents = null;
+		Map<String, String> responseHeaders = Collections.emptyMap();
+		try {
+			// Gather headers.
+			Map<String, String> headers = new HashMap<String, String>();
+			addCacheHeaders(headers, request.getCacheEntry());
+			httpResponse = mHttpStack.performRequest(request, headers);
+			StatusLine statusLine = httpResponse.getStatusLine();
+			int statusCode = statusLine.getStatusCode();
+
+			responseHeaders = convertHeaders(httpResponse.getAllHeaders());
+			// Handle cache validation.
+			if (statusCode == HttpStatus.SC_NOT_MODIFIED) {
+
+				Entry entry = request.getCacheEntry();
+				if (entry == null) {
+					return new NetworkResponse(HttpStatus.SC_NOT_MODIFIED, null,
+							responseHeaders, true,
+							SystemClock.elapsedRealtime() - requestStart);
+				}
+
+				// A HTTP 304 response does not have all header fields. We
+				// have to use the header fields from the cache entry plus
+				// the new ones from the response.
+				// http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.5
+				entry.responseHeaders.putAll(responseHeaders);
+				return new NetworkResponse(HttpStatus.SC_NOT_MODIFIED, entry.data,
+						entry.responseHeaders, true,
+						SystemClock.elapsedRealtime() - requestStart);
+			}
+
+			// Some responses such as 204s do not have content.  We must check.
+			if (httpResponse.getEntity() != null) {
+				responseContents = entityToBytes(httpResponse.getEntity());
+			} else {
+				// Add 0 byte response as a way of honestly representing a
+				// no-content request.
+				responseContents = new byte[0];
+			}
+
+			// if the request is slow, log it.
+			long requestLifetime = SystemClock.elapsedRealtime() - requestStart;
+			logSlowRequests(requestLifetime, request, responseContents, statusLine);
+
+			if (statusCode < 200 || statusCode > 299) {
+				throw new IOException();
+			}
+			return new NetworkResponse(statusCode, responseContents, responseHeaders, false,
+				SystemClock.elapsedRealtime() - requestStart);
+		} catch (SocketTimeoutException e) {
+			attemptRetryOnException("socket", request, new TimeoutError());
+		} catch (ConnectTimeoutException e) {
+			attemptRetryOnException("connection", request, new TimeoutError());
+		} catch (MalformedURLException e) {
+			throw new RuntimeException("Bad URL " + request.getUrl(), e);
+		} catch (IOException e) {
+			int statusCode = 0;
+			NetworkResponse networkResponse = null;
+			if (httpResponse != null) {
+				statusCode = httpResponse.getStatusLine().getStatusCode();
+			} else {
+				throw new NoConnectionError(e);
+			}
+			VolleyLog.e("Unexpected response code %d for %s", statusCode, request.getUrl());
+			if (responseContents != null) {
+				networkResponse = new NetworkResponse(statusCode, responseContents,
+						responseHeaders, false, SystemClock.elapsedRealtime() - requestStart);
+				if (statusCode == HttpStatus.SC_UNAUTHORIZED ||
+						statusCode == HttpStatus.SC_FORBIDDEN) {
+					attemptRetryOnException("auth",
+							request, new AuthFailureError(networkResponse));
+				} else {
+					// TODO: Only throw ServerError for 5xx status codes.
+					throw new ServerError(networkResponse);
+				}
+			} else {
+				throw new NetworkError(networkResponse);
+			}
+		}
+	}
+}
+{% endhighlight %}
+
+这个方法是网络请求的具体实现，也是一个大while循环，其中mHttpStack.performRequest(request, headers);代码中的mHttpStack是Volley的newRequestQueue()方法中创建的实例，
+前面已经说过，这两个对象的内部实际就是分别使用HttpURLConnection和HttpClient来发送网络请求的，然后把服务器返回的数据组装成一个NetworkResponse对象进行返回。
+在NetworkDispatcher中收到了NetworkResponse这个返回值后又会调用Request的parseNetworkResponse()方法来解析NetworkResponse中的数据，
+同时将数据写入到缓存，这个方法的实现是交给Request的子类来完成的，因为不同种类的Request解析的方式也肯定不同。
+
+钱买你可以看到在NetWorkDispatcher的run中最后执行了mDelivery.postResponse(request, response);，也就是说在解析完了NetworkResponse中的数据之后，
+又会调用ExecutorDelivery（ResponseDelivery接口的实现类）的postResponse()方法来回调解析出的数据，具体代码如下所示：
+
+{% highlight ruby %}
+@Override
+public void postResponse(Request<?> request, Response<?> response, Runnable runnable) {
+	request.markDelivered();
+	request.addMarker("post-response");
+	mResponsePoster.execute(new ResponseDeliveryRunnable(request, response, runnable));
+}
+{% endhighlight %}
+
+这里可以看见在mResponsePoster的execute()方法中传入了一个ResponseDeliveryRunnable对象，
+就可以保证该对象中的run()方法就是在主线程当中运行的了，我们看下run()方法中的代码是什么样的：
+
+{% highlight ruby %}
+/**
+ * A Runnable used for delivering network responses to a listener on the
+ * main thread.
+ */
+@SuppressWarnings("rawtypes")
+private class ResponseDeliveryRunnable implements Runnable {
+	private final Request mRequest;
+	private final Response mResponse;
+	private final Runnable mRunnable;
+
+	public ResponseDeliveryRunnable(Request request, Response response, Runnable runnable) {
+		mRequest = request;
+		mResponse = response;
+		mRunnable = runnable;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void run() {
+		// If this request has canceled, finish it and don't deliver.
+		if (mRequest.isCanceled()) {
+			mRequest.finish("canceled-at-delivery");
+			return;
+		}
+
+		// Deliver a normal response or error, depending.
+		if (mResponse.isSuccess()) {
+			mRequest.deliverResponse(mResponse.result);
+		} else {
+			mRequest.deliverError(mResponse.error);
+		}
+
+		// If this is an intermediate response, add a marker, otherwise we're done
+		// and the request can be finished.
+		if (mResponse.intermediate) {
+			mRequest.addMarker("intermediate-response");
+		} else {
+			mRequest.finish("done");
+		}
+
+		// If we have been provided a post-delivery runnable, run it.
+		if (mRunnable != null) {
+			mRunnable.run();
+		}
+	}
+}
+{% endhighlight %}
+
+这段代码里的run方法中可以看到如下一部分细节：
+
+{% highlight ruby %}
+// Deliver a normal response or error, depending.
+if (mResponse.isSuccess()) {
+	mRequest.deliverResponse(mResponse.result);
+} else {
+	mRequest.deliverError(mResponse.error);
+}
+{% endhighlight %}
+
+这段代码是最核心的，明显可以看到通过mRequest的deliverResponse或者deliverError将反馈发送到回调到UI线程。这也是你重写实现的接口方法。
+
+<hr>
+
+##**再来整体看下**
+
+现在是该回过头去看背景知识模块了，再看下那幅官方图，对比就明白咋回事了。
