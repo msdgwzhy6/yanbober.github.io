@@ -581,4 +581,27 @@ if (mResponse.isSuccess()) {
 
 ##**再来整体看下**
 
-现在是该回过头去看背景知识模块了，再看下那幅官方图，对比就明白咋回事了。
+现在是该回过头去看背景知识模块了，再看下那幅官方图，对比就明白咋回事了。结合上图和如上分析可以知道：
+
+1. 当一个RequestQueue被成功申请后会开启一个CacheDispatcher和4个默认的NetworkDispatcher。
+
+2. CacheDispatcher缓存调度器最为第一层缓冲，开始工作后阻塞的从缓存序列mCacheQueue中取得请求；
+对于已经取消的请求，标记为跳过并结束这个请求；新的或者过期的请求，直接放入mNetworkQueue中由N个NetworkDispatcher进行处理；
+已获得缓存信息（网络应答）却没有过期的请求，由Request的parseNetworkResponse进行解析，从而确定此应答是否成功。
+然后将请求和应答交由Delivery分发者进行处理，如果需要更新缓存那么该请求还会被放入mNetworkQueue中。
+
+3. 将请求Request add到RequestQueue后对于不需要缓存的请求（需要额外设置，默认是需要缓存）直接丢入mNetworkQueue交给N个NetworkDispatcher处理；
+对于需要缓存的，新的请求加到mCacheQueue中给CacheDispatcher处理；需要缓存，但是缓存列表中已经存在了相同URL的请求，
+放在mWaitingQueue中做暂时处理，等待之前请求完毕后，再重新添加到mCacheQueue中。
+
+4. 网络请求调度器NetworkDispatcher作为网络请求真实发生的地方，对消息交给BasicNetwork进行处理，同样的，请求和结果都交由Delivery分发者进行处理。
+
+5. Delivery分发者实际上已经是对网络请求处理的最后一层了，在Delivery对请求处理之前，Request已经对网络应答进行过解析，此时应答成功与否已经设定；
+而后Delivery根据请求所获得的应答情况做不同处理；若应答成功，则触发deliverResponse方法，最终会触发开发者为Request设定的Listener；
+若应答失败，则触发deliverError方法，最终会触发开发者为Request设定的ErrorListener；
+处理完后，一个Request的生命周期就结束了，Delivery会调用Request的finish操作，将其从mRequestQueue中移除，
+与此同时，如果等待列表中存在相同URL的请求，则会将剩余的层级请求全部丢入mCacheQueue交由CacheDispatcher进行处理。
+
+至此所有搞定。
+
+**PPPS一句：通过上面原理分析之后总结发现，推荐整个App全局持有一个RequestQueue的做法，这样会有相对比较高的性能效率。**
