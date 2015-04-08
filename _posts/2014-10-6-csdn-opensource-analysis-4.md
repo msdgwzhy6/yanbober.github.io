@@ -605,3 +605,7 @@ if (mResponse.isSuccess()) {
 至此所有搞定。
 
 **PPPS一句：通过上面原理分析之后总结发现，推荐整个App全局持有一个RequestQueue的做法，这样会有相对比较高的性能效率。**
+
+<hr>
+
+[走读代码时参考博客链接](http://www.cnblogs.com/cpacm/p/4211719.html)
