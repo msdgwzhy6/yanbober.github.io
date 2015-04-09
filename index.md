@@ -8,7 +8,7 @@ description: 工匠若水的主页-开发者干货分享
 {% include site/setup %}
 
 <hr>
-**欢迎使劲戳右上方指点我的博客文章！！！**
+#**欢迎点击右上方访问更多技术文章**
 <hr>
 
 ## 置顶爆料头条
@@ -33,6 +33,9 @@ description: 工匠若水的主页-开发者干货分享
 
 [友情链接  夏安明的CSDN博客主页](http://blog.csdn.net/xiaanming)
 
+## HTTP协议详解优秀博客直通车
+
+[友情链接  肖佳的HTTP博客](http://www.cnblogs.com/TankXiao/category/415412.html)
 
 ## 移动设备浏览我的主页请扫描如下二维码:
 
