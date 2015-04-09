@@ -321,68 +321,68 @@ NetworkDispatcher中是怎么处理网络请求队列的，具体代码如下所
 {% highlight ruby %}
 @Override
 public void run() {
-	Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-	while (true) {
-		long startTimeMs = SystemClock.elapsedRealtime();
-		Request<?> request;
-		try {
-			// Take a request from the queue.
-			request = mQueue.take();
-		} catch (InterruptedException e) {
-			// We may have been interrupted because it was time to quit.
-			if (mQuit) {
-				return;
-			}
-			continue;
-		}
+    Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+    while (true) {
+        long startTimeMs = SystemClock.elapsedRealtime();
+        Request<?> request;
+        try {
+            // Take a request from the queue.
+            request = mQueue.take();
+        } catch (InterruptedException e) {
+            // We may have been interrupted because it was time to quit.
+            if (mQuit) {
+                return;
+            }
+            continue;
+        }
 
-		try {
-			request.addMarker("network-queue-take");
+        try {
+            request.addMarker("network-queue-take");
 
-			// If the request was cancelled already, do not perform the
-			// network request.
-			if (request.isCanceled()) {
-				request.finish("network-discard-cancelled");
-				continue;
-			}
+            // If the request was cancelled already, do not perform the
+            // network request.
+            if (request.isCanceled()) {
+                request.finish("network-discard-cancelled");
+                continue;
+            }
 
-			addTrafficStatsTag(request);
+            addTrafficStatsTag(request);
 
-			// Perform the network request.
-			NetworkResponse networkResponse = mNetwork.performRequest(request);
-			request.addMarker("network-http-complete");
+            // Perform the network request.
+            NetworkResponse networkResponse = mNetwork.performRequest(request);
+            request.addMarker("network-http-complete");
 
-			// If the server returned 304 AND we delivered a response already,
-			// we're done -- don't deliver a second identical response.
-			if (networkResponse.notModified && request.hasHadResponseDelivered()) {
-				request.finish("not-modified");
-				continue;
-			}
+            // If the server returned 304 AND we delivered a response already,
+            // we're done -- don't deliver a second identical response.
+            if (networkResponse.notModified && request.hasHadResponseDelivered()) {
+                request.finish("not-modified");
+                continue;
+            }
 
-			// Parse the response here on the worker thread.
-			Response<?> response = request.parseNetworkResponse(networkResponse);
-			request.addMarker("network-parse-complete");
+            // Parse the response here on the worker thread.
+            Response<?> response = request.parseNetworkResponse(networkResponse);
+            request.addMarker("network-parse-complete");
 
-			// Write to cache if applicable.
-			// TODO: Only update cache metadata instead of entire record for 304s.
-			if (request.shouldCache() && response.cacheEntry != null) {
-				mCache.put(request.getCacheKey(), response.cacheEntry);
-				request.addMarker("network-cache-written");
-			}
+            // Write to cache if applicable.
+            // TODO: Only update cache metadata instead of entire record for 304s.
+            if (request.shouldCache() && response.cacheEntry != null) {
+                mCache.put(request.getCacheKey(), response.cacheEntry);
+                request.addMarker("network-cache-written");
+            }
 
-			// Post the response back.
-			request.markDelivered();
-			mDelivery.postResponse(request, response);
-		} catch (VolleyError volleyError) {
-			volleyError.setNetworkTimeMs(SystemClock.elapsedRealtime() - startTimeMs);
-			parseAndDeliverNetworkError(request, volleyError);
-		} catch (Exception e) {
-			VolleyLog.e(e, "Unhandled exception %s", e.toString());
-			VolleyError volleyError = new VolleyError(e);
-			volleyError.setNetworkTimeMs(SystemClock.elapsedRealtime() - startTimeMs);
-			mDelivery.postError(request, volleyError);
-		}
-	}
+            // Post the response back.
+            request.markDelivered();
+            mDelivery.postResponse(request, response);
+        } catch (VolleyError volleyError) {
+            volleyError.setNetworkTimeMs(SystemClock.elapsedRealtime() - startTimeMs);
+            parseAndDeliverNetworkError(request, volleyError);
+        } catch (Exception e) {
+            VolleyLog.e(e, "Unhandled exception %s", e.toString());
+            VolleyError volleyError = new VolleyError(e);
+            volleyError.setNetworkTimeMs(SystemClock.elapsedRealtime() - startTimeMs);
+            mDelivery.postError(request, volleyError);
+        }
+    }
 }
 {% endhighlight %}
 
