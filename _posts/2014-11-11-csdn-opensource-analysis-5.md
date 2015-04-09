@@ -59,7 +59,7 @@ android-async-http是专门针对Android在Apache的HttpClient基础上构建的
 
 <hr>
 
-##**使用一把**
+##**整体操作流程**
 
 android-async-http最简单基础的使用只需如下步骤：
 
@@ -68,9 +68,14 @@ android-async-http最简单基础的使用只需如下步骤：
 3. 调用AsyncHttpClient的某个get方法，传递你需要的（成功和失败时）callback接口实现，一般都是匿名内部类
 ，实现了AsyncHttpResponseHandler，类库自己也提供许多现成的response handler，你一般不需要自己创建。
 
-####**入门级的一个体验例子**
+<hr>
 
-如下是一个灰常基础的使用方式：
+##**AsyncHttpClient与AsyncHttpResponseHandler基础GET体验**
+
+AsyncHttpClient类通常用在android应用程序中创建异步GET, POST, PUT和DELETE HTTP请求，
+请求参数通过RequestParams实例创建，响应通过重写匿名内部类ResponseHandlerInterface方法处理。
+
+如下代码展示了使用AsyncHttpClient与AsyncHttpResponseHandler的基础操作：
 
 {% highlight ruby %}
 AsyncHttpClient client = new AsyncHttpClient();
@@ -112,7 +117,9 @@ client.get("www.baidu.com", new AsyncHttpResponseHandler() {
 });
 {% endhighlight %}
 
-####**官方推荐做法**
+<hr>
+
+##**官方推荐AsyncHttpClient静态实例化的封装**
 
 **注意**：官方推荐使用一个静态的AsyncHttpClient，官方示例代码如下：
 
@@ -139,7 +146,175 @@ public class TwitterRestClient {
 通过官方这个推荐例子可以发现，我们在用时可以直接通过类名调用需要的请求方法。所以我们可以自己多封装一些不同的请求方法，比如参数不同的方法，下载方法，
 上传方法等。
 
-####**再唠叨几句**
+<hr>
+
+##**RequestParams的基础使用**
+
+{% highlight ruby %}
+RequestParams params = new RequestParams();
+params.put("username", "yanbober");
+params.put("password", "123456");
+params.put("email", "yanbobersky@email.com");
+
+/*
+* Upload a File
+*/
+params.put("file_pic", new File("test.jpg"));
+params.put("file_inputStream", inputStream);
+params.put("file_bytes", new ByteArrayInputStream(bytes));
+
+/*
+* url params: "user[first_name]=jesse&user[last_name]=yan"
+*/
+Map<String, String> map = new HashMap<String, String>();
+map.put("first_name", "jesse");
+map.put("last_name", "yan");
+params.put("user", map);
+
+/*
+* url params: "what=haha&like=wowo"
+*/
+Set<String> set = new HashSet<String>();
+set.add("haha");
+set.add("wowo");
+params.put("what", set);
+
+/*
+* url params: "languages[]=Java&languages[]=C"
+*/
+List<String> list = new ArrayList<String>();
+list.add("Java");
+list.add("C");
+params.put("languages", list);
+
+/*
+* url params: "colors[]=blue&colors[]=yellow"
+*/
+String[] colors = { "blue", "yellow" };
+params.put("colors", colors);
+
+/*
+* url params: "users[][age]=30&users[][gender]=male&users[][age]=25&users[][gender]=female"
+*/
+List<Map<String, String>> listOfMaps = new ArrayList<Map<String, String>>();
+Map<String, String> user1 = new HashMap<String, String>();
+user1.put("age", "30");
+user1.put("gender", "male");
+Map<String, String> user2 = new HashMap<String, String>();
+user2.put("age", "25");
+user2.put("gender", "female");
+listOfMaps.add(user1);
+listOfMaps.add(user2);
+params.put("users", listOfMaps);
+
+/*
+* 使用实例
+*/
+AsyncHttpClient client = new AsyncHttpClient();
+client.post("http://localhost:8080/androidtest/", params, responseHandler);
+{% endhighlight %}
+
+<hr>
+
+##**JsonHttpResponseHandler带Json参数的POST**
+
+{% highlight ruby %}
+try {
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("username", "ryantang");
+    StringEntity stringEntity = new StringEntity(jsonObject.toString());
+    client.post(mContext, "http://api.com/login", stringEntity, "application/json", new JsonHttpResponseHandler(){
+        @Override
+        public void onSuccess(JSONObject jsonObject) {
+            super.onSuccess(jsonObject);
+        }
+    });
+} catch (JSONException e) {
+    e.printStackTrace();
+} catch (UnsupportedEncodingException e) {
+    e.printStackTrace();
+}
+{% endhighlight %}
+
+<hr>
+
+##**BinaryHttpResponseHandler下载文件**
+
+{% highlight ruby %}
+client.get("http://download/file/test.java", new BinaryHttpResponseHandler() {
+    @Override
+    public void onSuccess(byte[] arg0) {
+        super.onSuccess(arg0);
+        File file = Environment.getExternalStorageDirectory();
+        File file2 = new File(file, "down");
+        file2.mkdir();
+        file2 = new File(file2, "down_file.jpg");
+        try {
+            FileOutputStream oStream = new FileOutputStream(file2);
+            oStream.write(arg0);
+            oStream.flush();
+            oStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.i(null, e.toString());
+        }
+    }
+});
+{% endhighlight %}
+
+<hr>
+
+##**RequestParams上传文件**
+
+{% highlight ruby %}
+File myFile = new File("/sdcard/test.java");
+RequestParams params = new RequestParams();
+try {
+    params.put("filename", myFile);
+    AsyncHttpClient client = new AsyncHttpClient();
+    client.post("http://update/server/location/", params, new AsyncHttpResponseHandler(){
+        @Override
+        public void onSuccess(int statusCode, String content) {
+            super.onSuccess(statusCode, content);
+        }
+    });
+} catch(FileNotFoundException e) {
+    e.printStackTrace();
+}
+{% endhighlight %}
+
+<hr>
+
+##**PersistentCookieStore持久化存储cookie**
+
+官方文档里说PersistentCookieStore类用于实现Apache HttpClient的CookieStore接口，
+可自动将cookie保存到Android设备的SharedPreferences中，
+如果你打算使用cookie来管理验证会话，这个非常有用，因为用户可以保持登录状态，不管关闭还是重新打开你的app。
+
+文档里介绍了持久化Cookie的步骤：
+
+1. 创建 AsyncHttpClient实例对象；
+2. 将客户端的cookie保存到PersistentCookieStore实例对象，带有activity或者应用程序context的构造方法；
+3. 任何从服务器端获取的cookie都会持久化存储到myCookieStore中，添加一个cookie到存储中，只需要构造一个新的cookie对象，并且调用addCookie方法；
+
+下面这个例子就是铁证：
+
+{% highlight ruby %}
+AsyncHttpClient client = new AsyncHttpClient(); 
+
+PersistentCookieStore cookieStore = new PersistentCookieStore(this);  
+client.setCookieStore(cookieStore); 
+
+BasicClientCookie newCookie = new BasicClientCookie("name", "value");  
+newCookie.setVersion(1);  
+newCookie.setDomain("mycompany.com");  
+newCookie.setPath("/");  
+cookieStore.addCookie(newCookie);
+{% endhighlight %}
+
+<hr>
+
+##**总结性的唠叨几句**
 
 AsyncHttpResponseHandler是一个请求返回处理、成功、失败、开始、完成等自定义的消息的类，如上第一个基础例子中所示。
 
@@ -151,22 +326,4 @@ AsyncHttpRequest继承自Runnable，是基于线程的子类，用于异步请�
 
 PersistentCookieStore继承自CookieStore，是一个基于CookieStore的子类， 使用HttpClient处理数据，并且使用cookie持久性存储接口。
 
-{% highlight ruby %}
-{% endhighlight %}
-
-
-{% highlight ruby %}
-{% endhighlight %}
-
-
-{% highlight ruby %}
-{% endhighlight %}
-
-
-{% highlight ruby %}
-{% endhighlight %}
-
-
-{% highlight ruby %}
-{% endhighlight %}
-<hr>
+**PS：例子用的在牛逼还不如阅读开头列出的官方文档和源码吧。**
