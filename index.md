@@ -33,9 +33,11 @@ description: 工匠若水的主页-开发者干货分享
 
 [友情链接  夏安明的CSDN博客主页](http://blog.csdn.net/xiaanming)
 
-## HTTP协议详解优秀博客直通车
+## 网络协议优秀博客直通车
 
-[友情链接  肖佳的HTTP博客](http://www.cnblogs.com/TankXiao/category/415412.html)
+[友情链接  肖佳的HTTP协议详解博客](http://www.cnblogs.com/TankXiao/category/415412.html)
+
+[友情链接  Socket抓包博客](http://www.cnblogs.com/TankXiao/archive/2012/10/10/2711777.html)
 
 ## 移动设备浏览我的主页请扫描如下二维码:
 
