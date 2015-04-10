@@ -37,6 +37,8 @@ description: 工匠若水的主页-开发者干货分享
 
 [友情链接  肖佳的HTTP协议详解博客](http://www.cnblogs.com/TankXiao/category/415412.html)
 
+[友情链接  HTTPS协议详解博客](http://haomou.net/2014/08/30/2014_https/)
+
 [友情链接  Socket抓包博客](http://www.cnblogs.com/TankXiao/archive/2012/10/10/2711777.html)
 
 ## 移动设备浏览我的主页请扫描如下二维码:
