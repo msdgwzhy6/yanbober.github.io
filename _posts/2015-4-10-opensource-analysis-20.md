@@ -17,6 +17,8 @@ facebook Fresco仓库：git clone https://github.com/facebook/fresco
 
 facebook Fresco主页：http://fresco-cn.org/docs/index.html#_
 
+Fresco Demo：https://github.com/yanbober/Android-Blog-Source/tree/master/Fresco-Android-CN-Demo
+
 <hr>
 
 ##**背景介绍**
@@ -83,18 +85,19 @@ Fresco的image pipeline设计，允许用户在多方面控制图片的加载：
 
 ##**实战一把屌爆天的功能**
 
+我经过实战发现使用时有几步需要留意：
 
+1. jcenter和mavenCentral都已经有这个库了。
+2. 在Application里init切记在Android管理文件里声明name，否则容易跳坑。
 
-{% highlight ruby %}
+目前截图只是简单的测试体验了下这个屌爆天的库基本功能，日后还会持续补充：
 
-{% endhighlight %}
+<img src="http://yanbober.github.io/open/fresco1.png" />
 
+该实例代码[点我下载](https://github.com/yanbober/Android-Blog-Source/tree/master/Fresco-Android-CN-Demo)
 
-{% highlight ruby %}
+##**IMAGE PIPELINE指南**
 
-{% endhighlight %}
+[参见这里](http://fresco-cn.org/docs/intro-image-pipeline.html#_)
 
-
-{% highlight ruby %}
-
-{% endhighlight %}
+关于这个屌爆天的库会依据日后使用持续更新修改该文章补充。
