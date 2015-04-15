@@ -92,7 +92,7 @@ Fresco的image pipeline设计，允许用户在多方面控制图片的加载：
 
 目前截图只是简单的测试体验了下这个屌爆天的库基本功能，日后还会持续补充：
 
-<img src="http://yanbober.github.io/open/fresco1.png" />
+<img src="http://yanbober.github.io/image/open/fresco1.png" />
 
 该实例代码[点我下载](https://github.com/yanbober/Android-Blog-Source/tree/master/Fresco-Android-CN-Demo)
 
