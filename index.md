@@ -21,6 +21,8 @@ description: 工匠若水的主页-开发者干货分享
 
 ## 设计模式优秀博客直通车
 
+[友情链接 LoveLion的专栏](http://blog.csdn.net/lovelion/article/details/17517213)
+
 [友情链接 卡奴达摩的专栏](http://blog.csdn.net/zhengzhb/article/category/926691/)
 
 ## Android优秀博客直通车
