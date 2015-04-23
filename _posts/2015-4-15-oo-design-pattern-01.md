@@ -2,7 +2,7 @@
 layout: post
 keywords: 设计模式, 软件架构, 软件设计原则
 description: 设计模式系列学习记录
-title: "设计模式之综述"
+title: "设计模式之面向对象与类基础特征概念"
 categories: [设计模式]
 tags: [设计模式]
 group: archive
